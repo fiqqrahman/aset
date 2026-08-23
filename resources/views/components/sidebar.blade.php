@@ -1,6 +1,5 @@
 <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
     <div>
-        <!-- Header Logo -->
         <div class="h-16 flex items-center px-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
                 <div
@@ -14,7 +13,6 @@
             </div>
         </div>
 
-        <!-- Navigation Links -->
         <nav class="p-4 space-y-1">
             <p class="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Utama</p>
 
@@ -95,7 +93,6 @@
         </nav>
     </div>
 
-    <!-- User Context Footer -->
     <div class="p-4 border-t border-slate-800">
         <div class="flex items-center gap-3">
             <div

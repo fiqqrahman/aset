@@ -3,7 +3,6 @@
 @section('title', 'Dashboard Inventaris Aset - Disdik Kota Palangka Raya')
 
 @section('content')
-    <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
             <h2 class="text-lg font-bold text-slate-900 tracking-tight">Ringkasan Inventaris & Pemetaan Aset</h2>
@@ -16,12 +15,8 @@
         </span>
     </div>
 
-    <!-- Bento Grid Structure -->
     <div class="grid grid-cols-12 gap-4">
 
-        <!-- Bento Row 1: Metric Cards dengan Icon (4 Cards x 3 Cols - Paling Atas) -->
-
-        <!-- Metric Card 1: Total Aset -->
         <div class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
                 <div class="flex items-center justify-between">
@@ -42,7 +37,6 @@
             </div>
         </div>
 
-        <!-- Metric Card 2: Total Unit/Sekolah -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
@@ -64,7 +58,6 @@
             </div>
         </div>
 
-        <!-- Metric Card 3: Kondisi Baik -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
@@ -86,7 +79,6 @@
             </div>
         </div>
 
-        <!-- Metric Card 4: Rusak / Perlu Perbaikan -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
@@ -108,7 +100,6 @@
             </div>
         </div>
 
-        <!-- Bento Row 2: GIS Map Container (12 Cols) -->
         <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[400px]">
             <div class="flex items-center justify-between mb-3">
                 <div>
@@ -126,15 +117,12 @@
                     </span>
                 </div>
             </div>
-            <!-- Leaflet Container -->
             <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
                 <div id="map"></div>
             </div>
         </div>
 
-        <!-- Bento Row 3: Log Aktivitas Terbaru (8 Cols) + Klasifikasi KIB (4 Cols) -->
 
-        <!-- Table Recent Activity/Unit Listing -->
         <div
             class="col-span-12 lg:col-span-8 bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between">
             <div>
@@ -209,7 +197,6 @@
             </div>
         </div>
 
-        <!-- Right Side Widget: Breakdown Category (KIB) -->
         <div
             class="col-span-12 lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
@@ -276,19 +263,16 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Coordinate Center: Palangka Raya (-2.2096, 113.9145)
             const map = L.map('map', {
                 zoomControl: true,
                 scrollWheelZoom: false
             }).setView([-2.2096, 113.9145], 12);
 
-            // Tile Layer: OpenStreetMap Clean Style
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
-            // Mock GeoJSON Points: Unit Sekolah di Palangka Raya
             const schools = [{
                     name: "SDN 1 Pahandut",
                     lat: -2.2130,
@@ -319,7 +303,6 @@
                 }
             ];
 
-            // Render Markers
             schools.forEach(school => {
                 const markerColor = school.status === "Baik" ? "#16a34a" : "#f59e0b";
 
