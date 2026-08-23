@@ -1,4 +1,5 @@
 <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-10">
+    <!-- Left Section: Global Search Bar -->
     <div class="flex items-center gap-4 w-1/3">
         <div class="relative w-full">
             <input type="text" placeholder="Cari Kode Barang, Nama Aset, NIP, atau ID Sekolah..."
@@ -11,11 +12,8 @@
         </div>
     </div>
 
+    <!-- Right Section: System Context & Actions -->
     <div class="flex items-center gap-3">
-
-
-        <div class="h-4 w-px bg-slate-200"></div>
-
         <div class="flex items-center gap-1.5">
             <label for="ta_selector"
                 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider hidden sm:inline">TA:</label>
@@ -57,5 +55,21 @@
             </svg>
             <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
         </button>
+
+        <div class="h-4 w-px bg-slate-200"></div>
+
+        <!-- Tombol Logout Secure (POST Form) -->
+        <form method="POST" action="{{ route('logout') }}" class="inline">
+            @csrf
+            <button type="submit"
+                class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-md transition-colors flex items-center gap-1.5 text-xs font-medium"
+                title="Keluar dari Sistem">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span class="hidden xl:inline">Keluar</span>
+            </button>
+        </form>
     </div>
 </header>
