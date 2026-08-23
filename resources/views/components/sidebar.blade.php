@@ -1,9 +1,9 @@
 <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0">
     <div>
-        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+        <div class="h-[52px] flex items-center px-6 border-b border-slate-800 shrink-0">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-8 h-8 rounded bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
+                    class="w-7 h-7 rounded bg-emerald-600 flex items-center justify-center text-white font-bold text-xs">
                     PR
                 </div>
                 <div>

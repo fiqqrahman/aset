@@ -45,17 +45,23 @@
     @stack('styles')
 </head>
 
-<body class="h-full text-slate-800 antialiased selection:bg-slate-200">
+<body class="h-full text-slate-800 antialiased selection:bg-slate-200 overflow-hidden">
+    <!-- h-screen & overflow-hidden mengunci layar agar tidak scroll sebadan-badan -->
+    <div class="h-screen flex overflow-hidden">
 
-    <div class="min-h-full flex">
+        <!-- Sidebar Fixed Layout -->
         @include('components.sidebar')
-        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+        <!-- Main Content Area (Berdiri Sendiri & Scrollable) -->
+        <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
             @include('components.navbar')
-            <main class="p-6 space-y-6">
+            <main class="p-6 space-y-6 flex-1">
                 @yield('content')
             </main>
         </div>
+
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             function updateClock() {
@@ -64,28 +70,23 @@
                 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
                     'September', 'Oktober', 'November', 'Desember'
                 ];
-
                 const dayName = days[now.getDay()];
                 const date = now.getDate();
                 const monthName = months[now.getMonth()];
                 const year = now.getFullYear();
-
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-
                 const clockEl = document.getElementById('realtime-clock');
                 if (clockEl) {
                     clockEl.textContent = `${dayName}, ${date} ${monthName} ${year} pukul ${hours}.${minutes} WIB`;
                 }
             }
             updateClock();
-            setInterval(updateClock, 30000); // Update setiap 30 detik (tanpa beban re-render berlebih)
+            setInterval(updateClock, 30000);
         });
     </script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     @stack('scripts')
-
-
 </body>
 
 </html>
