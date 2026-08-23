@@ -3,16 +3,17 @@
 @section('title', 'Dashboard Inventaris Aset - Disdik Kota Palangka Raya')
 
 @section('content')
+
+    @include('components.breadcrumb', [
+        'items' => [['label' => 'Dashboard Overview']],
+    ])
+
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
             <h2 class="text-lg font-bold text-slate-900 tracking-tight">Ringkasan Inventaris & Pemetaan Aset</h2>
             <p class="text-xs text-slate-500">Monitoring rekapitulasi data barang milik daerah unit pendidikan Kota Palangka
                 Raya.</p>
         </div>
-        <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 w-max">
-            Sinkronisasi Terakhir: Hari ini 08:00 WIB
-        </span>
     </div>
 
     <div class="grid grid-cols-12 gap-4">
@@ -121,7 +122,6 @@
                 <div id="map"></div>
             </div>
         </div>
-
 
         <div
             class="col-span-12 lg:col-span-8 bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between">
