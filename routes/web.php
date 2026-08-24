@@ -15,4 +15,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('pages.dashboard');
     })->name('dashboard');
+
+    Route::get('/aset-sekolah', function () {
+        return view('pages.aset-sekolah');
+    })->name('aset-sekolah');
+
+    Route::get('/master-unit', function () {
+        return view('pages.master-unit');
+    })->name('master-unit');
 });
