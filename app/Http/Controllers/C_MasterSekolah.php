@@ -84,7 +84,6 @@ class C_MasterSekolah extends Controller
             $lastSync  = date('d M Y - H:i:s \W\I\B', File::lastModified($fileFull));
         }
 
-        // --- PING HEALTH-CHECK KE SERVER KEMENDIKDASMEN ---
         try {
             $response = Http::timeout(3)
                 ->withHeaders([
