@@ -10,7 +10,7 @@ class C_MasterSekolah extends Controller
 {
     public function index(Request $request)
     {
-        $jsonPath = storage_path('json/sekolah_smp.json');
+        $jsonPath = storage_path('json/sekolah.json');
 
         if (!File::exists($jsonPath)) {
             abort(404, 'File JSON sekolah_smp.json tidak ditemukan di storage/json/');
@@ -88,7 +88,7 @@ class C_MasterSekolah extends Controller
     public function masterUnit()
     {
         $jsonDir = storage_path('json');
-        $fileSmp = $jsonDir . '/sekolah_smp.json';
+        $fileSmp = $jsonDir . '/sekolah.json';
 
         $totalData = 0;
         $lastSync = 'Belum Ada Data';
