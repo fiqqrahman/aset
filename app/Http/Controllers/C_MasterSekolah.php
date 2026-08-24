@@ -15,74 +15,62 @@ class C_MasterSekolah extends Controller
     public function index(Request $request)
     {
         $jsonPath = storage_path('json/sekolah.json');
+        $allData = [];
 
-        if (!File::exists($jsonPath)) {
-            $allData = collect();
-        } else {
-            $rawJson = File::get($jsonPath);
-            $decoded = json_decode($rawJson, true);
-            $allData = collect($decoded['data'] ?? []);
+        if (File::exists($jsonPath)) {
+            $jsonContent = File::get($jsonPath);
+            $allData = json_decode($jsonContent, true) ?? [];
         }
 
-        // 1. Hitung Metrik Bento Cards
-        $totalSekolah = $allData->count();
-        $totalNegeri  = $allData->where('status_sekolah', 'NEGERI')->count();
-        $totalSwasta  = $allData->where('status_sekolah', 'SWASTA')->count();
-        $totalAkredA  = $allData->where('akreditasi', 'A')->count();
+        $collection = collect($allData);
 
-        // 2. Filter Data
-        $filtered = $allData->filter(function ($item) use ($request) {
-            $matchSearch    = true;
-            $matchKecamatan = true;
-            $matchStatus    = true;
-            $matchJenjang   = true;
+        // Dynamic Lists for Dropdown Filters
+        $listKecamatan = $collection->pluck('kecamatan')->filter()->unique()->sort()->values();
+        $listJenjang = $collection->pluck('bentuk_pendidikan')->filter()->unique()->sort()->values();
 
-            if ($request->filled('search')) {
-                $keyword     = strtolower($request->search);
-                $matchSearch = str_contains(strtolower($item['nama'] ?? ''), $keyword) ||
-                    str_contains(strtolower($item['npsn'] ?? ''), $keyword);
-            }
+        // Apply Search & Filters
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $collection = $collection->filter(function ($item) use ($search) {
+                return str_contains(strtolower($item['nama'] ?? ''), $search)
+                    || str_contains(strtolower($item['npsn'] ?? ''), $search);
+            });
+        }
 
-            if ($request->filled('kecamatan')) {
-                $matchKecamatan = strtolower($item['kecamatan'] ?? '') === strtolower($request->kecamatan);
-            }
+        if ($request->filled('kecamatan')) {
+            $collection = $collection->where('kecamatan', $request->kecamatan);
+        }
 
-            if ($request->filled('status_sekolah')) {
-                $matchStatus = strtoupper($item['status_sekolah'] ?? '') === strtoupper($request->status_sekolah);
-            }
+        if ($request->filled('status_sekolah')) {
+            $collection = $collection->where('status_sekolah', $request->status_sekolah);
+        }
 
-            if ($request->filled('bentuk_pendidikan')) {
-                $matchJenjang = strtoupper($item['bentuk_pendidikan'] ?? '') === strtoupper($request->bentuk_pendidikan);
-            }
+        if ($request->filled('jenjang')) {
+            $collection = $collection->where('bentuk_pendidikan', $request->jenjang);
+        }
 
-            return $matchSearch && $matchKecamatan && $matchStatus && $matchJenjang;
-        });
+        // Calculate Dynamic Metrics for All Levels
+        $metrics = [
+            'total_sekolah' => $collection->count(),
+            'negeri'        => $collection->where('status_sekolah', 'NEGERI')->count(),
+            'swasta'        => $collection->where('status_sekolah', 'SWASTA')->count(),
+            'akred_a'       => $collection->where('akreditasi', 'A')->count(),
+        ];
 
-        // 3. Paginasi Manual
-        $perPage     = 10;
+        // Manual Pagination Logic
+        $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentPageItems = $filtered->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $currentItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
-        $sekolahPaginator = new LengthAwarePaginator(
-            $currentPageItems,
-            $filtered->count(),
+        $sekolah = new LengthAwarePaginator(
+            $currentItems,
+            $collection->count(),
             $perPage,
             $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
         );
 
-        $listKecamatan = $allData->pluck('kecamatan')->filter()->unique()->sort()->values();
-
-        return view('pages.aset-sekolah', [
-            'sekolah' => $sekolahPaginator,
-            'metrics' => [
-                'total_smp' => $totalSekolah,
-                'negeri'    => $totalNegeri,
-                'swasta'    => $totalSwasta,
-                'akred_a'   => $totalAkredA,
-            ],
-            'listKecamatan' => $listKecamatan,
-        ]);
+        return view('pages.aset-sekolah', compact('sekolah', 'metrics', 'listKecamatan', 'listJenjang'));
     }
 
     /**
