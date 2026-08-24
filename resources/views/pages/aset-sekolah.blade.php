@@ -15,6 +15,19 @@
                 Raya.</p>
         </div>
         <div class="flex items-center gap-2">
+            <form method="POST" action="{{ route('admin.aset-sekolah.snapshot') }}">
+                @csrf
+                <button type="submit"
+                    onclick="return confirm('Apakah antum yakin ingin melakukan snapshot/sinkronisasi seluruh data JSON ke Database?')"
+                    class="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Snapshot ke DB
+                </button>
+            </form>
+
             <button
                 class="px-3 py-1.5 text-xs font-medium bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 shadow-sm">
                 <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,17 +36,10 @@
                 </svg>
                 Ekspor Data SMP
             </button>
-            <button
-                class="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Tambah Unit SMP
-            </button>
         </div>
     </div>
 
-    <!-- Metrics Summary Rows (Bento Cards) -->
+    <!-- Metrics Summary Rows (Bento Cards Dinamis) -->
     <div class="grid grid-cols-12 gap-4 mb-4">
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
@@ -47,7 +53,7 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-slate-900 mt-1">53 Unit</p>
+                <p class="text-xl font-bold text-slate-900 mt-1">{{ $metrics['total_smp'] }} Unit</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Negeri & Swasta</span>
@@ -67,11 +73,11 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-emerald-600 mt-1">16 Sekolah</p>
+                <p class="text-xl font-bold text-emerald-600 mt-1">{{ $metrics['negeri'] }} Sekolah</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Aset Pemda</span>
-                <span class="font-medium text-slate-700">100% Validasi KIB</span>
+                <span class="font-medium text-slate-700">Terverifikasi</span>
             </div>
         </div>
 
@@ -87,7 +93,7 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-blue-600 mt-1">37 Sekolah</p>
+                <p class="text-xl font-bold text-blue-600 mt-1">{{ $metrics['swasta'] }} Sekolah</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Hibah / Mandiri</span>
@@ -108,11 +114,13 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-slate-900 mt-1">28 Sekolah</p>
+                <p class="text-xl font-bold text-slate-900 mt-1">{{ $metrics['akred_a'] }} Sekolah</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Rasio Standar Sarpras</span>
-                <span class="font-medium text-amber-600">52,8%</span>
+                <span class="font-medium text-amber-600">
+                    {{ $metrics['total_smp'] > 0 ? round(($metrics['akred_a'] / $metrics['total_smp']) * 100, 1) : 0 }}%
+                </span>
             </div>
         </div>
     </div>
@@ -121,11 +129,12 @@
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm">
         <div>
             <!-- Filters Header -->
-            <div
+            <form method="GET" action="{{ route('admin.aset-sekolah') }}"
                 class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="relative">
-                        <input type="text" placeholder="Cari NPSN atau Nama SMP..."
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Cari NPSN atau Nama SMP..."
                             class="w-64 pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:border-slate-300 focus:outline-none transition-all placeholder:text-slate-400">
                         <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
@@ -134,28 +143,35 @@
                         </svg>
                     </div>
 
-                    <select
+                    <select name="kecamatan" onchange="this.form.submit()"
                         class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
                         <option value="">Semua Kecamatan</option>
-                        <option value="Pahandut" selected>Kec. Pahandut</option>
-                        <option value="Jekan Raya">Kec. Jekan Raya</option>
-                        <option value="Sabangau">Kec. Sabangau</option>
-                        <option value="Bukit Batu">Kec. Bukit Batu</option>
-                        <option value="Rakumpit">Kec. Rakumpit</option>
+                        @foreach ($listKecamatan as $kec)
+                            <option value="{{ $kec }}" {{ request('kecamatan') == $kec ? 'selected' : '' }}>
+                                {{ $kec }}</option>
+                        @endforeach
                     </select>
 
-                    <select
+                    <select name="status_sekolah" onchange="this.form.submit()"
                         class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
                         <option value="">Semua Status</option>
-                        <option value="NEGERI">NEGERI</option>
-                        <option value="SWASTA">SWASTA</option>
+                        <option value="NEGERI" {{ request('status_sekolah') == 'NEGERI' ? 'selected' : '' }}>NEGERI
+                        </option>
+                        <option value="SWASTA" {{ request('status_sekolah') == 'SWASTA' ? 'selected' : '' }}>SWASTA
+                        </option>
                     </select>
+
+                    @if (request()->anyFilled(['search', 'kecamatan', 'status_sekolah']))
+                        <a href="{{ route('admin.aset-sekolah') }}"
+                            class="text-xs text-rose-600 hover:underline px-2 py-1">Reset Filter</a>
+                    @endif
                 </div>
 
                 <div class="text-xs text-slate-500">
-                    Menampilkan <strong>3</strong> dari <strong>53</strong> SMP terdata
+                    Menampilkan <strong>{{ $sekolah->count() }}</strong> dari <strong>{{ $sekolah->total() }}</strong> SMP
+                    terdata
                 </div>
-            </div>
+            </form>
 
             <!-- Table Body -->
             <div class="overflow-x-auto">
@@ -167,111 +183,52 @@
                             <th class="py-3 px-4">Nama Unit Sekolah</th>
                             <th class="py-3 px-4">Status & Akreditasi</th>
                             <th class="py-3 px-4">Kecamatan / Alamat</th>
-                            <th class="py-3 px-4">KIB Aset Terdaftar</th>
+                            <th class="py-3 px-4">Kode Pos</th>
                             <th class="py-3 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-xs">
-                        <!-- Data 1 -->
-                        <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="py-3.5 px-4 font-mono font-semibold text-slate-700">70051854</td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-semibold text-slate-900">SMP FILOSOFI ISLAMIC BOARDING SCHOOL</div>
-                                <span class="text-[10px] text-slate-400">ID: 9BDEC788-5071-4026-9995-D132421F9A14</span>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-1.5">
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">SWASTA</span>
-                                    <span
-                                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Akred
-                                        A</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-medium text-slate-800">Kec. Pahandut</div>
-                                <div class="text-slate-500 truncate max-w-xs text-[11px]">JL. Mahir Mahar Km. 5,1</div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                    142 Item Aset
-                                </span>
-                            </td>
-                            <td class="py-3.5 px-4 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 rounded border border-emerald-200 transition-colors">Detail
-                                    Aset</button>
-                            </td>
-                        </tr>
-
-                        <!-- Data 2 -->
-                        <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="py-3.5 px-4 font-mono font-semibold text-slate-700">70051387</td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-semibold text-slate-900">SMP Islam Imam Nawawi</div>
-                                <span class="text-[10px] text-slate-400">ID: B90C4146-199C-4F46-BB88-C564A7F93814</span>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-1.5">
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">SWASTA</span>
-                                    <span
-                                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Akred
-                                        B</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-medium text-slate-800">Kec. Jekan Raya</div>
-                                <div class="text-slate-500 truncate max-w-xs text-[11px]">Jl. Tjilik Riwut KM 8 (Jl. Gajah
-                                    Mada)</div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                    98 Item Aset
-                                </span>
-                            </td>
-                            <td class="py-3.5 px-4 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 rounded border border-emerald-200 transition-colors">Detail
-                                    Aset</button>
-                            </td>
-                        </tr>
-
-                        <!-- Data 3 -->
-                        <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="py-3.5 px-4 font-mono font-semibold text-slate-700">70051210</td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-semibold text-slate-900">SMPIT TIARA AZ-ZAHRA</div>
-                                <span class="text-[10px] text-slate-400">ID: 78154BA7-8764-40CD-BEB5-DBD93860F3C5</span>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-1.5">
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200">SWASTA</span>
-                                    <span
-                                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Akred
-                                        C</span>
-                                </div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <div class="font-medium text-slate-800">Kec. Pahandut</div>
-                                <div class="text-slate-500 truncate max-w-xs text-[11px]">JL. Temanggung Surajayapati, No.
-                                    334</div>
-                            </td>
-                            <td class="py-3.5 px-4">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                                    45 Item Aset
-                                </span>
-                            </td>
-                            <td class="py-3.5 px-4 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 rounded border border-emerald-200 transition-colors">Detail
-                                    Aset</button>
-                            </td>
-                        </tr>
+                        @forelse($sekolah as $item)
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-3.5 px-4 font-mono font-semibold text-slate-700">{{ $item['npsn'] ?? '-' }}
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <div class="font-semibold text-slate-900">{{ $item['nama'] ?? '-' }}</div>
+                                    <span class="text-[10px] text-slate-400">ID: {{ $item['sekolah_id'] ?? '-' }}</span>
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <div class="flex items-center gap-1.5">
+                                        <span
+                                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium {{ ($item['status_sekolah'] ?? '') === 'NEGERI' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200' }}">
+                                            {{ $item['status_sekolah'] ?? '-' }}
+                                        </span>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                            Akred {{ $item['akreditasi'] ?? '-' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-4">
+                                    <div class="font-medium text-slate-800">{{ $item['kecamatan'] ?? '-' }}</div>
+                                    <div class="text-slate-500 truncate max-w-xs text-[11px]">
+                                        {{ $item['alamat_jalan'] ?? '-' }}</div>
+                                </td>
+                                <td class="py-3.5 px-4 text-slate-600 font-mono">
+                                    {{ $item['kode_pos'] ?? '-' }}
+                                </td>
+                                <td class="py-3.5 px-4 text-right space-x-1">
+                                    <button
+                                        class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 rounded border border-emerald-200 transition-colors">Detail
+                                        Aset</button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
+                                    Data sekolah tidak ditemukan. Coba ubah kata kunci pencarian/filter.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -279,13 +236,9 @@
 
         <!-- Table Footer Pagination -->
         <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span>Halaman 1 dari 18</span>
-            <div class="flex items-center gap-1">
-                <button
-                    class="px-2.5 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50 disabled:opacity-50"
-                    disabled>Sebelumnya</button>
-                <button
-                    class="px-2.5 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-50">Selanjutnya</button>
+            <span>Halaman {{ $sekolah->currentPage() }} dari {{ $sekolah->lastPage() }}</span>
+            <div>
+                {{ $sekolah->links() }}
             </div>
         </div>
     </div>

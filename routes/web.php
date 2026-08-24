@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\C_MasterSekolah;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,11 +17,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('pages.dashboard');
     })->name('dashboard');
 
-    Route::get('/aset-sekolah', function () {
-        return view('pages.aset-sekolah');
-    })->name('aset-sekolah');
+    Route::get('/aset-sekolah', [C_MasterSekolah::class, 'index'])->name('aset-sekolah');
+    Route::post('/aset-sekolah/snapshot', [C_MasterSekolah::class, 'snapshot'])->name('aset-sekolah.snapshot');
 
-    Route::get('/master-unit', function () {
-        return view('pages.master-unit');
-    })->name('master-unit');
+    Route::get('/master-unit', [C_MasterSekolah::class, 'masterUnit'])->name('master-unit');
+    Route::post('/master-unit/sync', [C_MasterSekolah::class, 'syncApi'])->name('master-unit.sync');
 });
