@@ -146,7 +146,7 @@ class C_MasterSekolah extends Controller
         $jsonDir = storage_path('json');
         $sourceFile = null;
 
-        $candidateFiles = ['smp.json', 'master_sekolah_base.json', 'sekolah.json'];
+        $candidateFiles = ['meta-data.json'];
         foreach ($candidateFiles as $file) {
             if (File::exists($jsonDir . '/' . $file)) {
                 $sourceFile = $jsonDir . '/' . $file;

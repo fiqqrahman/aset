@@ -10,8 +10,7 @@
     <!-- Page Title & Header Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div>
-            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Master Unit Sekolah
-            </h2>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight">Master Unit Sekolah</h2>
             <p class="text-xs text-slate-500">Direktori unit sekolah jenjang TK/PAUD, SD, & SMP Negeri/Swasta di Kota
                 Palangka Raya.</p>
         </div>
@@ -143,7 +142,6 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-
                     <select name="jenjang" onchange="this.form.submit()"
                         class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
                         <option value="">Semua Jenjang</option>
@@ -153,7 +151,6 @@
                             </option>
                         @endforeach
                     </select>
-
                     <select name="kecamatan" onchange="this.form.submit()"
                         class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
                         <option value="">Semua Kecamatan</option>
@@ -163,7 +160,6 @@
                             </option>
                         @endforeach
                     </select>
-
                     <select name="status_sekolah" onchange="this.form.submit()"
                         class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none">
                         <option value="">Semua Status</option>
@@ -172,7 +168,6 @@
                         <option value="SWASTA" {{ request('status_sekolah') == 'SWASTA' ? 'selected' : '' }}>SWASTA
                         </option>
                     </select>
-
                     @if (request()->anyFilled(['search', 'jenjang', 'kecamatan', 'status_sekolah']))
                         <a href="{{ route('admin.aset-sekolah') }}"
                             class="text-xs text-rose-600 hover:underline px-2 py-1">Reset Filter</a>
@@ -194,7 +189,6 @@
                             <th class="py-3 px-4">Nama Unit Sekolah</th>
                             <th class="py-3 px-4">Jenjang & Status</th>
                             <th class="py-3 px-4">Kecamatan / Alamat</th>
-                            <th class="py-3 px-4">Kode Pos</th>
                             <th class="py-3 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -206,7 +200,8 @@
                                 </td>
                                 <td class="py-3.5 px-4">
                                     <div class="font-semibold text-slate-900">{{ $item['nama'] ?? '-' }}</div>
-                                    <span class="text-[10px] text-slate-400">ID: {{ $item['sekolah_id'] ?? '-' }}</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">ID:
+                                        {{ $item['sekolah_id'] ?? '-' }}</span>
                                 </td>
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-1.5 flex-wrap">
@@ -230,19 +225,36 @@
                                         {{ $item['alamat_jalan'] ?? '-' }}
                                     </div>
                                 </td>
-                                <td class="py-3.5 px-4 text-slate-600 font-mono">
-                                    {{ $item['kode_pos'] ?? '-' }}
-                                </td>
-                                <td class="py-3.5 px-4 text-right space-x-1">
-                                    <button
-                                        class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50 rounded border border-emerald-200 transition-colors">
-                                        Detail Aset
-                                    </button>
+                                <td class="py-3.5 px-4 text-right">
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <!-- Tombol Detail Aset (Icon Minimalis) -->
+                                        <button type="button" title="Detail Aset Unit"
+                                            class="p-1.5 text-emerald-700 hover:bg-emerald-50 rounded-lg border border-emerald-200 transition-colors shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Tombol Detail Sekolah / Full Detail (Icon Minimalis) -->
+                                        <button type="button" title="Informasi Full Detail Sekolah"
+                                            onclick="openDetailModal('{{ $item['sekolah_id'] }}', {{ json_encode($item) }})"
+                                            class="p-1.5 text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
+                                <td colspan="5" class="py-8 text-center text-slate-400 text-xs">
                                     Data unit sekolah tidak ditemukan. Coba ubah kata kunci pencarian/filter.
                                 </td>
                             </tr>
@@ -260,4 +272,103 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Full Detail Sekolah (Minimalis UI Pop-up) -->
+    <div id="schoolDetailModal"
+        class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm items-center justify-center p-4">
+        <div
+            class="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div>
+                    <h3 id="modalTitle" class="text-sm font-bold text-slate-900">Detail Informasi Sekolah</h3>
+                    <p id="modalSub" class="text-[11px] text-slate-500 font-mono"></p>
+                </div>
+                <button onclick="closeDetailModal()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-200/50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-5 overflow-y-auto space-y-4 text-xs">
+                <!-- Dynamic Content Container -->
+                <div id="modalBodyContent"></div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="p-3 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button onclick="closeDetailModal()"
+                    class="px-3 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function openDetailModal(sekolahId, item) {
+            const modal = document.getElementById('schoolDetailModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSub = document.getElementById('modalSub');
+            const modalBody = document.getElementById('modalBodyContent');
+
+            modalTitle.textContent = item.nama || 'Detail Sekolah';
+            modalSub.textContent = `NPSN: ${item.npsn || '-'} | ID: ${sekolahId}`;
+
+            const s = item.sekolah || {};
+            const r = item.ruang || {};
+            const p = item.ptk || {};
+            const rs = item.rasio_siswa || {};
+
+            modalBody.innerHTML = `
+            <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Status / Akreditasi</span> <span class="font-semibold text-slate-800">${item.status_sekolah || '-'} / Akred ${item.akreditasi || '-'}</span></div>
+                <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Kecamatan</span> <span class="font-semibold text-slate-800">${item.kecamatan || '-'}</span></div>
+                <div class="col-span-2"><span class="text-slate-400 block text-[10px] uppercase font-bold">Alamat Jalan</span> <span class="font-semibold text-slate-800">${item.alamat_jalan || '-'}</span></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 pt-2">
+                <div class="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">
+                    <span class="text-emerald-600 block text-[10px] font-bold uppercase">Luas Tanah Milik</span>
+                    <span class="text-sm font-bold text-slate-900">${s.luas_tanah_milik ?? 0} m²</span>
+                </div>
+                <div class="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
+                    <span class="text-blue-600 block text-[10px] font-bold uppercase">Daya Listrik</span>
+                    <span class="text-sm font-bold text-slate-900">${s.daya_listrik ?? 0} Watt</span>
+                </div>
+                <div class="p-2.5 bg-amber-50/50 rounded-lg border border-amber-100">
+                    <span class="text-amber-600 block text-[10px] font-bold uppercase">Jumlah Peserta Didik</span>
+                    <span class="text-sm font-bold text-slate-900">${rs.jml_pd ?? 0} Siswa</span>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <h4 class="font-bold text-slate-900 mb-1.5 uppercase text-[10px] tracking-wider text-slate-400">Fasilitas Ruang Kelas & PTK</h4>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Kelas Baik:</span> <strong class="text-slate-800">${r.ruang_kelas_baik ?? 0}</strong></div>
+                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Perpustakaan:</span> <strong class="text-slate-800">${r.ruang_perpustakaan_baik ?? 0}</strong></div>
+                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Laki-laki:</span> <strong class="text-slate-800">${p.ptk_guru_l ?? 0} Orang</strong></div>
+                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Perempuan:</span> <strong class="text-slate-800">${p.ptk_guru_p ?? 0} Orang</strong></div>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500">
+                <span>Email: <strong class="text-slate-700">${s.email || '-'}</strong></span>
+                <span>Telepon: <strong class="text-slate-700">${s.nomor_telepon || '-'}</strong></span>
+            </div>
+        `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('schoolDetailModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+    </script>
+@endpush
