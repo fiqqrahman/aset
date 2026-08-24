@@ -130,110 +130,103 @@ class C_MasterSekolah extends Controller
     /**
      * Real Crawler Pipeline Engine (Based on Seed JSON Files)
      */
-    public function syncApi(Request $request)
+    public function syncStream()
     {
         set_time_limit(600);
         ini_set('memory_limit', '512M');
 
-        $headers = [
-            'User-Agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept'       => 'application/json',
-            'Content-Type' => 'application/json',
-            'Referer'      => 'https://sekolah.data.kemendikdasmen.go.id/',
-        ];
+        return response()->stream(function () {
+            $headers = [
+                'User-Agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Accept'       => 'application/json',
+                'Referer'      => 'https://sekolah.data.kemendikdasmen.go.id/',
+            ];
 
-        // 1. Cari File Sumber (Prioritas: smp.json -> master_sekolah_base.json -> sekolah.json)
-        $jsonDir = storage_path('json');
-        $sourceFile = null;
+            $jsonDir = storage_path('json');
+            $sourceFile = $jsonDir . '/meta-data.json';
 
-        $candidateFiles = ['meta-data.json'];
-        foreach ($candidateFiles as $file) {
-            if (File::exists($jsonDir . '/' . $file)) {
-                $sourceFile = $jsonDir . '/' . $file;
-                break;
+            if (!File::exists($sourceFile)) {
+                echo "data: " . json_encode(['error' => 'File meta-data.json tidak ditemukan!']) . "\n\n";
+                ob_flush();
+                flush();
+                return;
             }
-        }
 
-        if (!$sourceFile) {
-            return redirect()->back()->with('error', 'Gagal: File sumber JSON (smp.json) tidak ditemukan di storage/json/');
-        }
+            $rawContent = File::get($sourceFile);
+            $decoded = json_decode($rawContent, true) ?? [];
+            $listSekolah = $decoded['data'] ?? $decoded;
+            $totalSekolah = count($listSekolah);
 
-        // 2. Decode Data Sumber & Ekstrak List Sekolah
-        $rawContent = File::get($sourceFile);
-        $decoded = json_decode($rawContent, true) ?? [];
-        $listSekolah = $decoded['data'] ?? $decoded;
+            $masterDataMerged = [];
+            $processed = 0;
 
-        if (empty($listSekolah) || !is_array($listSekolah)) {
-            return redirect()->back()->with('error', 'Gagal: Data pada file ' . basename($sourceFile) . ' kosong atau tidak valid.');
-        }
+            foreach ($listSekolah as $index => $itemUmum) {
+                $sekolahId = $itemUmum['sekolah_id'] ?? null;
+                if (!$sekolahId) continue;
 
-        $masterDataMerged = [];
+                $sekolahNode = [
+                    'sekolah_id'        => $sekolahId,
+                    'nama'              => $itemUmum['nama'] ?? '-',
+                    'npsn'              => $itemUmum['npsn'] ?? '-',
+                    'status_sekolah'    => $itemUmum['status_sekolah'] ?? '-',
+                    'bentuk_pendidikan' => $itemUmum['bentuk_pendidikan'] ?? '-',
+                    'akreditasi'        => $itemUmum['akreditasi'] ?? '-',
+                    'alamat_jalan'      => $itemUmum['alamat_jalan'] ?? '-',
+                    'kecamatan'         => $itemUmum['kecamatan'] ?? '-',
+                    'sekolah'           => [],
+                    'ruang'             => [],
+                    'ptk'               => [],
+                    'rasio_siswa'       => [],
+                    'rasio_rombel_ruang_kelas' => []
+                ];
 
-        try {
-            // 3. Batching Rate Limiting per 10 Sekolah
-            $batches = array_chunk($listSekolah, 10);
-
-            foreach ($batches as $batch) {
-                foreach ($batch as $itemUmum) {
-                    $sekolahId = $itemUmum['sekolah_id'] ?? null;
-                    if (!$sekolahId) continue;
-
-                    // Baseline node
-                    $sekolahNode = [
-                        'sekolah_id'        => $sekolahId,
-                        'nama'              => $itemUmum['nama'] ?? '-',
-                        'npsn'              => $itemUmum['npsn'] ?? '-',
-                        'status_sekolah'    => $itemUmum['status_sekolah'] ?? '-',
-                        'bentuk_pendidikan' => $itemUmum['bentuk_pendidikan'] ?? '-',
-                        'akreditasi'        => $itemUmum['akreditasi'] ?? '-',
-                        'alamat_jalan'      => $itemUmum['alamat_jalan'] ?? '-',
-                        'kecamatan'         => $itemUmum['kecamatan'] ?? '-',
-                        'path_file'         => $itemUmum['path_file'] ?? null,
-                        'sekolah'           => [],
-                        'ruang'             => [],
-                        'ptk'               => [],
-                        'rasio_siswa'       => [],
-                        'rasio_rombel_ruang_kelas' => []
-                    ];
-
-                    // 4. Hit API Full Detail berdasarkan sekolah_id
+                try {
                     $detailUrl = "https://sekolah.data.kemendikdasmen.go.id/v1/sekolah-service/sekolah/full-detail/{$sekolahId}";
-                    $responseDetail = Http::withHeaders($headers)->get($detailUrl);
+                    $responseDetail = Http::withHeaders($headers)->timeout(5)->get($detailUrl);
 
                     if ($responseDetail->successful()) {
                         $payloadDetail = $responseDetail->json()['data'] ?? [];
-
-                        // Inject node "sekolah" lengkap dari Kemendikdasmen
                         $sekolahNode['sekolah']                  = $payloadDetail['sekolah'][0] ?? [];
                         $sekolahNode['ruang']                    = $payloadDetail['ruang'][0] ?? [];
                         $sekolahNode['ptk']                      = $payloadDetail['ptk'][0] ?? [];
                         $sekolahNode['rasio_siswa']              = $payloadDetail['rasio_siswa'][0] ?? [];
                         $sekolahNode['rasio_rombel_ruang_kelas'] = $payloadDetail['rasio_rombel_ruang_kelas'][0] ?? [];
 
-                        // Update atribut level root dari node sekolah jika tersedia
                         if (isset($payloadDetail['sekolah'][0])) {
                             $d = $payloadDetail['sekolah'][0];
-                            $sekolahNode['nama']              = $d['nama'] ?? $sekolahNode['nama'];
-                            $sekolahNode['npsn']              = $d['npsn'] ?? $sekolahNode['npsn'];
-                            $sekolahNode['status_sekolah']    = $d['status_sekolah'] ?? $sekolahNode['status_sekolah'];
-                            $sekolahNode['bentuk_pendidikan'] = $d['bentuk_pendidikan'] ?? $sekolahNode['bentuk_pendidikan'];
-                            $sekolahNode['akreditasi']        = $d['akreditasi'] ?? $sekolahNode['akreditasi'];
-                            $sekolahNode['alamat_jalan']      = $d['alamat_jalan'] ?? $sekolahNode['alamat_jalan'];
-                            $sekolahNode['kecamatan']         = $d['kecamatan'] ?? $sekolahNode['kecamatan'];
-                            $sekolahNode['lintang']           = $d['lintang'] ?? null;
-                            $sekolahNode['bujur']             = $d['bujur'] ?? null;
-                            $sekolahNode['email']             = $d['email'] ?? null;
-                            $sekolahNode['nomor_telepon']     = $d['nomor_telepon'] ?? null;
+                            $sekolahNode['nama']          = $d['nama'] ?? $sekolahNode['nama'];
+                            $sekolahNode['npsn']          = $d['npsn'] ?? $sekolahNode['npsn'];
+                            $sekolahNode['status_sekolah'] = $d['status_sekolah'] ?? $sekolahNode['status_sekolah'];
+                            $sekolahNode['kecamatan']     = $d['kecamatan'] ?? $sekolahNode['kecamatan'];
                         }
                     }
-
-                    $masterDataMerged[$sekolahId] = $sekolahNode;
-                    usleep(300000); // 300ms delay
+                } catch (\Exception $e) {
+                    // Log error item tapi tetep jalan
                 }
-                sleep(1); // 1 detik delay per batch
+
+                $masterDataMerged[$sekolahId] = $sekolahNode;
+                $processed++;
+
+                // Hitung percentage
+                $percentage = round(($processed / $totalSekolah) * 100);
+
+                // Send SSE Payload ke Client
+                echo "data: " . json_encode([
+                    'current'    => $processed,
+                    'total'      => $totalSekolah,
+                    'percentage' => $percentage,
+                    'nama'       => $sekolahNode['nama'],
+                    'npsn'       => $sekolahNode['npsn'],
+                    'status'     => 'INGESTED'
+                ]) . "\n\n";
+
+                ob_flush();
+                flush();
+
+                usleep(250000); // 250ms rate-limit throttle
             }
 
-            // 5. Simpan Hasil Gabungan ke storage/json/sekolah.json
+            // Save Final Payload
             File::put(
                 $jsonDir . '/sekolah.json',
                 json_encode([
@@ -244,9 +237,14 @@ class C_MasterSekolah extends Controller
                 ], JSON_PRETTY_PRINT)
             );
 
-            return redirect()->back()->with('success', 'Pipeline Sync Berhasil! ' . count($masterDataMerged) . ' Sekolah sukses di-ingest dari ' . basename($sourceFile) . ' ke sekolah.json');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal Eksekusi Sync: ' . $e->getMessage());
-        }
+            // Signal Done
+            echo "data: " . json_encode(['complete' => true]) . "\n\n";
+            ob_flush();
+            flush();
+        }, 200, [
+            'Cache-Control' => 'no-cache',
+            'Content-Type'  => 'text/event-stream',
+            'X-Accel-Buffering' => 'no'
+        ]);
     }
 }

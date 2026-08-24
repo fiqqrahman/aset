@@ -21,5 +21,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/aset-sekolah/snapshot', [C_MasterSekolah::class, 'snapshot'])->name('aset-sekolah.snapshot');
 
     Route::get('/master-unit', [C_MasterSekolah::class, 'masterUnit'])->name('master-unit');
-    Route::post('/master-unit/sync', [C_MasterSekolah::class, 'syncApi'])->name('master-unit.sync');
+    Route::get('/master-unit/sync-stream', [C_MasterSekolah::class, 'syncStream'])->name('master-unit.sync-stream');
 });
