@@ -36,11 +36,21 @@
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status Connection
                         API</span>
-                    <span
-                        class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">HTTP
-                        200 OK</span>
+                    @if ($apiStatus === 'CONNECTED')
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            HTTP {{ $httpCode }} OK
+                        </span>
+                    @else
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                            HTTP {{ $httpCode }} ERR
+                        </span>
+                    @endif
                 </div>
-                <p class="text-xl font-bold text-slate-900 mt-1">CONNECTED</p>
+                <p class="text-xl font-bold {{ $apiStatus === 'CONNECTED' ? 'text-slate-900' : 'text-rose-600' }} mt-1">
+                    {{ $apiStatus }}
+                </p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Target Host</span>
