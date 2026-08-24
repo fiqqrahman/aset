@@ -17,7 +17,6 @@
 
     <!-- Bento Grid Structure -->
     <div class="grid grid-cols-12 gap-4">
-
         <!-- Bento Row 1: Metric Cards -->
         <div class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
@@ -111,12 +110,15 @@
                     <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka
                         Raya</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 text-[10px] text-slate-500">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Optimal
+                <div class="flex items-center gap-3 text-[10px] text-slate-500">
+                    <span class="inline-flex items-center gap-1 font-semibold text-purple-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> TK/PAUD
                     </span>
-                    <span class="inline-flex items-center gap-1 text-[10px] text-slate-500">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> Maintenance
+                    <span class="inline-flex items-center gap-1 font-semibold text-blue-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> SD
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> SMP
                     </span>
                 </div>
             </div>
@@ -250,8 +252,7 @@
             </div>
         </div>
 
-        <!-- ================= NEW CONTENT (BARIS 4) ================= -->
-        <!-- Chart Analisis Nilai Perolehan & Penyusutan Aset (8 Cols) -->
+        <!-- Chart Analisis Nilai Perolehan & Penyusutan Aset -->
         <div
             class="col-span-12 lg:col-span-8 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div class="flex items-center justify-between mb-2">
@@ -275,13 +276,12 @@
             </div>
         </div>
 
-        <!-- Action Center & Admin Urgent Alerts (4 Cols) -->
+        <!-- Action Center & Admin Urgent Alerts -->
         <div
             class="col-span-12 lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div>
                 <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">Action Center Admin</h3>
                 <p class="text-[11px] text-slate-500 mb-3">Tugas prioritas & verifikasi yang memerlukan tindakan</p>
-
                 <div class="space-y-2.5">
                     <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/60 flex items-start gap-2.5">
                         <div class="w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0"></div>
@@ -292,7 +292,6 @@
                         </div>
                         <a href="#" class="text-[11px] font-bold text-amber-800 hover:underline shrink-0">Cek</a>
                     </div>
-
                     <div class="p-2.5 rounded-lg bg-rose-50/70 border border-rose-200/60 flex items-start gap-2.5">
                         <div class="w-2 h-2 rounded-full bg-rose-500 mt-1 shrink-0"></div>
                         <div class="flex-1 text-xs">
@@ -302,7 +301,6 @@
                         </div>
                         <a href="#" class="text-[11px] font-bold text-rose-800 hover:underline shrink-0">Review</a>
                     </div>
-
                     <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200/60 flex items-start gap-2.5">
                         <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1 shrink-0"></div>
                         <div class="flex-1 text-xs">
@@ -313,7 +311,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="pt-3 border-t border-slate-100 mt-3">
                 <button
                     class="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5">
@@ -325,17 +322,15 @@
                 </button>
             </div>
         </div>
-
     </div>
 @endsection
 
 @push('scripts')
     <!-- Inject Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Leaflet GIS Map Init
+            // 1. Leaflet GIS Map Init dengan Layer Per Jenjang dari sekolah.json
             const map = L.map('map', {
                 zoomControl: true,
                 scrollWheelZoom: false
@@ -346,55 +341,97 @@
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
-            const schools = [{
-                    name: "SDN 1 Pahandut",
-                    lat: -2.2130,
-                    lng: 113.9210,
-                    status: "Baik",
-                    totalAset: "Rp 1.2M"
-                },
-                {
-                    name: "SMPN 2 Palangka Raya",
-                    lat: -2.2020,
-                    lng: 113.9080,
-                    status: "Maintenance",
-                    totalAset: "Rp 3.4M"
-                },
-                {
-                    name: "SDN 3 Jekan Raya",
-                    lat: -2.1950,
-                    lng: 113.8990,
-                    status: "Baik",
-                    totalAset: "Rp 850M"
-                },
-                {
-                    name: "SMPN 1 Palangka Raya",
-                    lat: -2.2080,
-                    lng: 113.9150,
-                    status: "Baik",
-                    totalAset: "Rp 4.1M"
-                }
-            ];
+            // Layer Groups
+            const layerTK = L.layerGroup();
+            const layerSD = L.layerGroup();
+            const layerSMP = L.layerGroup();
 
-            schools.forEach(school => {
-                const markerColor = school.status === "Baik" ? "#16a34a" : "#f59e0b";
-                const circleMarker = L.circleMarker([school.lat, school.lng], {
-                    radius: 7,
-                    fillColor: markerColor,
-                    color: "#ffffff",
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                }).addTo(map);
+            // Fetch Data dari API Controller
+            fetch("{{ route('admin.api.map-sekolah') }}")
+                .then(async response => {
+                    const isJson = response.headers.get('content-type')?.includes('application/json');
+                    const data = isJson ? await response.json() : null;
 
-                circleMarker.bindPopup(`
-                <div style="font-family: 'Inter', sans-serif; font-size: 11px;">
-                    <strong style="font-size: 12px; display: block; margin-bottom: 2px;">${school.name}</strong>
-                    <span style="color: #64748b;">Total Aset: ${school.totalAset}</span><br>
-                    <span style="color: #64748b;">Status: <strong>${school.status}</strong></span>
-                </div>
-            `);
-            });
+                    if (!response.ok) {
+                        const errorMsg = (data && data.message) || response.statusText;
+                        throw new Error(`HTTP ${response.status}: ${errorMsg}`);
+                    }
+                    return data;
+                })
+                .then(data => {
+                    if (!data || !Array.isArray(data)) {
+                        console.error("Payload yang diterima bukan Array Sekolah:", data);
+                        return;
+                    }
+
+                    console.log(`Berhasil memuat ${data.length} sekolah ke Peta!`);
+
+                    data.forEach(item => {
+                        // Ambil koordinat lintang & bujur (Root or Child Node)
+                        const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ?
+                            item.sekolah[0] : (item.sekolah || {});
+
+                        const lat = parseFloat(item.lintang || sekolahNode.lintang || 0);
+                        const lng = parseFloat(item.bujur || sekolahNode.bujur || 0);
+
+                        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                            const bentuk = (item.bentuk_pendidikan || '').toUpperCase();
+                            let markerColor = '#64748b';
+
+                            if (['TK', 'PAUD', 'KB'].includes(bentuk)) {
+                                markerColor = '#a855f7';
+                            } else if (bentuk === 'SD') {
+                                markerColor = '#3b82f6';
+                            } else if (bentuk === 'SMP') {
+                                markerColor = '#10b981';
+                            }
+
+                            const circleMarker = L.circleMarker([lat, lng], {
+                                radius: 6,
+                                fillColor: markerColor,
+                                color: '#ffffff',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            });
+
+                            circleMarker.bindPopup(`
+                    <div style="font-family: 'Inter', sans-serif; font-size: 11px; padding: 2px;">
+                        <strong style="font-size: 12px; color: #0f172a; display: block; margin-bottom: 4px;">${item.nama || '-'}</strong>
+                        <span style="color: #475569; display: block;">NPSN: <strong>${item.npsn || '-'}</strong></span>
+                        <span style="color: #64748b; font-size: 10px; font-family: monospace; display: block; margin-top: 4px;">
+                            Lat: ${lat.toFixed(6)} | Lng: ${lng.toFixed(6)}
+                        </span>
+                    </div>
+                `);
+
+                            if (['TK', 'PAUD', 'KB'].includes(bentuk)) {
+                                circleMarker.addTo(layerTK);
+                            } else if (bentuk === 'SMP') {
+                                circleMarker.addTo(layerSMP);
+                            } else {
+                                circleMarker.addTo(layerSD);
+                            }
+                        }
+                    });
+
+                    layerTK.addTo(map);
+                    layerSD.addTo(map);
+                    layerSMP.addTo(map);
+
+                    const overlayMaps = {
+                        "<span style='font-size:11px; font-weight:600;'>Jenjang TK / PAUD</span>": layerTK,
+                        "<span style='font-size:11px; font-weight:600;'>Jenjang SD</span>": layerSD,
+                        "<span style='font-size:11px; font-weight:600;'>Jenjang SMP</span>": layerSMP
+                    };
+
+                    L.control.layers(null, overlayMaps, {
+                        collapsed: false
+                    }).addTo(map);
+                })
+                .catch(err => {
+                    console.error("DETAIL ERROR MAP:", err.message);
+                });
 
             // 2. Chart.js Asset Growth Init
             const ctx = document.getElementById('assetGrowthChart').getContext('2d');

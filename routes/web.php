@@ -1,7 +1,14 @@
 <?php
 
-use App\Http\Controllers\C_MasterSekolah;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\C_MasterSekolah;
+use App\Http\Controllers\Admin\AsetSekolahController;
+
+// Route::middleware(['auth'])->group(function () {
+//     // Secure Endpoint untuk Leaflet Map
+//     Route::get('/admin/api/map-sekolah', [AsetSekolahController::class, 'getMapData'])
+//         ->name('admin.api.map-sekolah');
+// });
 
 Route::get('/', function () {
     return view();
@@ -22,4 +29,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/master-unit', [C_MasterSekolah::class, 'masterUnit'])->name('master-unit');
     Route::get('/master-unit/sync-stream', [C_MasterSekolah::class, 'syncStream'])->name('master-unit.sync-stream');
+
+    Route::get('/api/map-sekolah', [C_MasterSekolah::class, 'getMapData'])
+        ->name('api.map-sekolah');
 });

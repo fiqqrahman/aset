@@ -247,4 +247,24 @@ class C_MasterSekolah extends Controller
             'X-Accel-Buffering' => 'no'
         ]);
     }
+
+    public function getMapData()
+    {
+        $jsonPath = storage_path('json/sekolah.json');
+
+        if (!File::exists($jsonPath)) {
+            return response()->json([
+                'error' => true,
+                'message' => 'File sekolah.json tidak ditemukan di storage/json/'
+            ], 404);
+        }
+
+        $rawJson = File::get($jsonPath);
+        $decoded = json_decode($rawJson, true) ?? [];
+
+        // Ambil data dari key 'data' jika ada, atau array murni
+        $sekolahList = $decoded['data'] ?? $decoded;
+
+        return response()->json($sekolahList, 200);
+    }
 }
