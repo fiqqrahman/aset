@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Control Tower Integrasi API - Disdik Kota Palangka Raya')
+@section('title', 'Control Integrasi API - Disdik Kota Palangka Raya')
 @section('content')
     @include('components.breadcrumb', [
         'items' => [['label' => 'Master & Integrasi Unit API']],
@@ -30,12 +30,25 @@
 
     <!-- Status Cards Grid -->
     <div class="grid grid-cols-12 gap-4 mb-4">
+        <!-- Card 1: Health Status API -->
         <div
             class="col-span-12 md:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status Connection
                         API</span>
+                    <div
+                        class="w-8 h-8 rounded-lg {{ $apiStatus === 'CONNECTED' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }} flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                    <p class="text-xl font-bold {{ $apiStatus === 'CONNECTED' ? 'text-slate-900' : 'text-rose-600' }}">
+                        {{ $apiStatus }}
+                    </p>
                     @if ($apiStatus === 'CONNECTED')
                         <span
                             class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -48,9 +61,6 @@
                         </span>
                     @endif
                 </div>
-                <p class="text-xl font-bold {{ $apiStatus === 'CONNECTED' ? 'text-slate-900' : 'text-rose-600' }} mt-1">
-                    {{ $apiStatus }}
-                </p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>Target Host</span>
@@ -58,13 +68,19 @@
             </div>
         </div>
 
+        <!-- Card 2: Total Merged Record -->
         <div
             class="col-span-12 md:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
                 <div class="flex items-center justify-between">
                     <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Merged
                         Record</span>
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                    </div>
                 </div>
                 <p class="text-xl font-bold text-slate-900 mt-1">{{ $totalData }} Sekolah</p>
             </div>
@@ -74,10 +90,20 @@
             </div>
         </div>
 
+        <!-- Card 3: Last Sync Time -->
         <div
             class="col-span-12 md:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
-                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Waktu Sync Terakhir</span>
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Waktu Sync
+                        Terakhir</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
                 <p class="text-xl font-bold text-slate-900 mt-1">{{ $lastSync }}</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
