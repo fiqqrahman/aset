@@ -101,29 +101,74 @@
             </div>
         </div>
 
-        <!-- Bento Row 2: GIS Map Container -->
-        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[550px]">
-            <div class="flex items-center justify-between mb-3">
+        <!-- Chart Analisis Nilai Perolehan & Penyusutan Aset -->
+        <div
+            class="col-span-12 lg:col-span-8 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
-                    </h3>
-                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka
-                        Raya</p>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Tren Pertumbuhan & Depresiasi
+                        Aset (5 Tahun)</h3>
+                    <p class="text-[11px] text-slate-500">Akumulasi pertumbuhan perolehan barang milik daerah unit
+                        pendidikan vs beban penyusutan</p>
                 </div>
-                <div class="flex items-center gap-3 text-[10px] text-slate-500">
-                    <span class="inline-flex items-center gap-1 font-semibold text-purple-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> TK/PAUD
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-600 font-medium">
+                        <span class="w-2.5 h-2.5 rounded bg-slate-800"></span> Nilai Perolehan
                     </span>
-                    <span class="inline-flex items-center gap-1 font-semibold text-blue-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> SD
-                    </span>
-                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> SMP
+                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-600 font-medium">
+                        <span class="w-2.5 h-2.5 rounded bg-rose-500"></span> Akumulasi Penyusutan
                     </span>
                 </div>
             </div>
-            <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
-                <div id="map"></div>
+            <div class="h-[220px] w-full pt-2">
+                <canvas id="assetGrowthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Action Center & Admin Urgent Alerts -->
+        <div
+            class="col-span-12 lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">Action Center Admin</h3>
+                <p class="text-[11px] text-slate-500 mb-3">Tugas prioritas & verifikasi yang memerlukan tindakan</p>
+                <div class="space-y-2.5">
+                    <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/60 flex items-start gap-2.5">
+                        <div class="w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0"></div>
+                        <div class="flex-1 text-xs">
+                            <p class="font-semibold text-amber-900">12 Sekolah Belum Rekonsiliasi</p>
+                            <p class="text-[10px] text-amber-700 mt-0.5">Batas waktu pelaporan TW II tersisa 5 hari lagi.
+                            </p>
+                        </div>
+                        <a href="#" class="text-[11px] font-bold text-amber-800 hover:underline shrink-0">Cek</a>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-rose-50/70 border border-rose-200/60 flex items-start gap-2.5">
+                        <div class="w-2 h-2 rounded-full bg-rose-500 mt-1 shrink-0"></div>
+                        <div class="flex-1 text-xs">
+                            <p class="font-semibold text-rose-900">45 Item Usulan Penghapusan</p>
+                            <p class="text-[10px] text-rose-700 mt-0.5">Menunggu verifikasi fisik & SK Pengelola Barang.
+                            </p>
+                        </div>
+                        <a href="#" class="text-[11px] font-bold text-rose-800 hover:underline shrink-0">Review</a>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200/60 flex items-start gap-2.5">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1 shrink-0"></div>
+                        <div class="flex-1 text-xs">
+                            <p class="font-semibold text-emerald-900">Jadwal Audit BPK RI</p>
+                            <p class="text-[10px] text-emerald-700 mt-0.5">Penilaian sampel KIB B & C dijadwalkan bulan
+                                depan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 mt-3">
+                <button
+                    class="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Proses Rekonsiliasi Massal
+                </button>
             </div>
         </div>
 
@@ -252,76 +297,35 @@
             </div>
         </div>
 
-        <!-- Chart Analisis Nilai Perolehan & Penyusutan Aset -->
-        <div
-            class="col-span-12 lg:col-span-8 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-2">
+        <!-- Bento Row 2: GIS Map Container -->
+        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[600px]">
+            <div class="flex items-center justify-between mb-3">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Tren Pertumbuhan & Depresiasi
-                        Aset (5 Tahun)</h3>
-                    <p class="text-[11px] text-slate-500">Akumulasi pertumbuhan perolehan barang milik daerah unit
-                        pendidikan vs beban penyusutan</p>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
+                    </h3>
+                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka
+                        Raya</p>
                 </div>
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-600 font-medium">
-                        <span class="w-2.5 h-2.5 rounded bg-slate-800"></span> Nilai Perolehan
+                <div class="flex items-center gap-3 text-[10px] text-slate-500">
+                    <span class="inline-flex items-center gap-1 font-semibold text-purple-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> TK/PAUD
                     </span>
-                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-600 font-medium">
-                        <span class="w-2.5 h-2.5 rounded bg-rose-500"></span> Akumulasi Penyusutan
+                    <span class="inline-flex items-center gap-1 font-semibold text-blue-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> SD
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> SMP
                     </span>
                 </div>
             </div>
-            <div class="h-[220px] w-full pt-2">
-                <canvas id="assetGrowthChart"></canvas>
+            <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
+                <div id="map"></div>
             </div>
         </div>
 
-        <!-- Action Center & Admin Urgent Alerts -->
-        <div
-            class="col-span-12 lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
-            <div>
-                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">Action Center Admin</h3>
-                <p class="text-[11px] text-slate-500 mb-3">Tugas prioritas & verifikasi yang memerlukan tindakan</p>
-                <div class="space-y-2.5">
-                    <div class="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/60 flex items-start gap-2.5">
-                        <div class="w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0"></div>
-                        <div class="flex-1 text-xs">
-                            <p class="font-semibold text-amber-900">12 Sekolah Belum Rekonsiliasi</p>
-                            <p class="text-[10px] text-amber-700 mt-0.5">Batas waktu pelaporan TW II tersisa 5 hari lagi.
-                            </p>
-                        </div>
-                        <a href="#" class="text-[11px] font-bold text-amber-800 hover:underline shrink-0">Cek</a>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-rose-50/70 border border-rose-200/60 flex items-start gap-2.5">
-                        <div class="w-2 h-2 rounded-full bg-rose-500 mt-1 shrink-0"></div>
-                        <div class="flex-1 text-xs">
-                            <p class="font-semibold text-rose-900">45 Item Usulan Penghapusan</p>
-                            <p class="text-[10px] text-rose-700 mt-0.5">Menunggu verifikasi fisik & SK Pengelola Barang.
-                            </p>
-                        </div>
-                        <a href="#" class="text-[11px] font-bold text-rose-800 hover:underline shrink-0">Review</a>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200/60 flex items-start gap-2.5">
-                        <div class="w-2 h-2 rounded-full bg-emerald-500 mt-1 shrink-0"></div>
-                        <div class="flex-1 text-xs">
-                            <p class="font-semibold text-emerald-900">Jadwal Audit BPK RI</p>
-                            <p class="text-[10px] text-emerald-700 mt-0.5">Penilaian sampel KIB B & C dijadwalkan bulan
-                                depan.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="pt-3 border-t border-slate-100 mt-3">
-                <button
-                    class="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Proses Rekonsiliasi Massal
-                </button>
-            </div>
-        </div>
+       
+
+        
     </div>
 @endsection
 

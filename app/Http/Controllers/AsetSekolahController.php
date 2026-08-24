@@ -21,7 +21,6 @@ class AsetSekolahController extends Controller
         $rawJson = File::get($jsonPath);
         $decoded = json_decode($rawJson, true);
 
-        // Ambil data baik dalam key 'data' maupun array murni
         $data = $decoded['data'] ?? $decoded;
 
         if (!is_array($data)) {

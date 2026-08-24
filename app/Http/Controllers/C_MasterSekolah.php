@@ -9,9 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class C_MasterSekolah extends Controller
 {
-    /**
-     * Halaman View Data Unit Sekolah (Membaca storage/json/sekolah.json)
-     */
+    // Function index
     public function index(Request $request)
     {
         $jsonPath = storage_path('json/sekolah.json');
@@ -25,11 +23,9 @@ class C_MasterSekolah extends Controller
 
         $collection = collect($allData);
 
-        // Dynamic Lists for Dropdown Filters
         $listKecamatan = $collection->pluck('kecamatan')->filter()->unique()->sort()->values();
         $listJenjang   = $collection->pluck('bentuk_pendidikan')->filter()->unique()->sort()->values();
 
-        // Apply Search & Filters
         if ($request->filled('search')) {
             $search = strtolower($request->search);
             $collection = $collection->filter(function ($item) use ($search) {
@@ -50,7 +46,6 @@ class C_MasterSekolah extends Controller
             $collection = $collection->where('bentuk_pendidikan', $request->jenjang);
         }
 
-        // Calculate Dynamic Metrics for All Levels
         $metrics = [
             'total_sekolah' => $collection->count(),
             'negeri'        => $collection->where('status_sekolah', 'NEGERI')->count(),
@@ -58,7 +53,6 @@ class C_MasterSekolah extends Controller
             'akred_a'       => $collection->where('akreditasi', 'A')->count(),
         ];
 
-        // Manual Pagination Logic
         $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $currentItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
@@ -74,9 +68,7 @@ class C_MasterSekolah extends Controller
         return view('pages.aset-sekolah', compact('sekolah', 'metrics', 'listKecamatan', 'listJenjang'));
     }
 
-    /**
-     * Halaman Control Tower Monitoring Integrasi API
-     */
+ 
     public function masterUnit()
     {
         $jsonDir  = storage_path('json');
@@ -126,10 +118,7 @@ class C_MasterSekolah extends Controller
             'httpCode'  => $httpCode,
         ]);
     }
-
-    /**
-     * Real Crawler Pipeline Engine (Based on Seed JSON Files)
-     */
+   
     public function syncStream()
     {
         set_time_limit(600);
@@ -201,16 +190,11 @@ class C_MasterSekolah extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    // Log error item tapi tetep jalan
                 }
 
                 $masterDataMerged[$sekolahId] = $sekolahNode;
                 $processed++;
-
-                // Hitung percentage
                 $percentage = round(($processed / $totalSekolah) * 100);
-
-                // Send SSE Payload ke Client
                 echo "data: " . json_encode([
                     'current'    => $processed,
                     'total'      => $totalSekolah,
@@ -223,10 +207,9 @@ class C_MasterSekolah extends Controller
                 ob_flush();
                 flush();
 
-                usleep(250000); // 250ms rate-limit throttle
+                usleep(250000); 
             }
 
-            // Save Final Payload
             File::put(
                 $jsonDir . '/sekolah.json',
                 json_encode([
@@ -237,7 +220,6 @@ class C_MasterSekolah extends Controller
                 ], JSON_PRETTY_PRINT)
             );
 
-            // Signal Done
             echo "data: " . json_encode(['complete' => true]) . "\n\n";
             ob_flush();
             flush();
@@ -261,8 +243,6 @@ class C_MasterSekolah extends Controller
 
         $rawJson = File::get($jsonPath);
         $decoded = json_decode($rawJson, true) ?? [];
-
-        // Ambil data dari key 'data' jika ada, atau array murni
         $sekolahList = $decoded['data'] ?? $decoded;
 
         return response()->json($sekolahList, 200);
