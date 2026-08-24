@@ -102,7 +102,7 @@
         </div>
 
         <!-- Bento Row 2: GIS Map Container -->
-        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[400px]">
+        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[550px]">
             <div class="flex items-center justify-between mb-3">
                 <div>
                     <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
