@@ -26,7 +26,7 @@ class AsetSekolahController extends Controller
         if (!is_array($data)) {
             return response()->json([
                 'error' => true,
-                'message' => 'Format isi sekolah.json corrupt / bukan JSON valid'
+                'message' => 'Format isi sekolah.json corrupt / Format tidak valid'
             ], 500);
         }
 
