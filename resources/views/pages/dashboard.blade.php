@@ -346,22 +346,22 @@
             const layerSD = L.layerGroup();
             const layerSMP = L.layerGroup();
 
-            // Function Helper untuk Membuat Custom Icon Marker Leaflet (Khusus TK, SD, SMP)
+            // Helper Custom Marker Icon Berdasarkan Warna Filosofi Seragam
             function createCustomIcon(bentuk) {
                 let badgeBg = '';
                 let labelText = '';
 
                 if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
-                    badgeBg = '#a855f7'; // Purple TK/PAUD
+                    badgeBg = '#16a34a'; // Hijau (Hijau Alam / Mengenal Dunia)
                     labelText = 'TK';
                 } else if (bentuk === 'SD') {
-                    badgeBg = '#2563eb'; // Blue SD
+                    badgeBg = '#dc2626'; // Merah (Seragam SD Merah Putih)
                     labelText = 'SD';
                 } else if (bentuk === 'SMP') {
-                    badgeBg = '#059669'; // Emerald SMP
+                    badgeBg = '#1e3a8a'; // Biru Gelap / Navy (Seragam SMP Biru Putih)
                     labelText = 'SMP';
                 } else {
-                    // Abaikan dan buang jika bentuk pendidikan bukan TK, SD, atau SMP (No Slate Default)
+                    // Abaikan unit di luar TK, SD, dan SMP
                     return null;
                 }
 
@@ -430,7 +430,7 @@
                             const bentuk = (item.bentuk_pendidikan || '').toUpperCase();
                             const customIcon = createCustomIcon(bentuk);
 
-                            // Jika bukan jenjang TK/SD/SMP (customIcon === null), langsung lewati
+                            // Jika di luar TK, SD, SMP, langsung bypass
                             if (!customIcon) return;
 
                             const marker = L.marker([lat, lng], { icon: customIcon });
@@ -504,7 +504,7 @@
 
                             marker.bindPopup(popupContent, { maxWidth: 300 });
 
-                            // Masukkan ke Layer Group Spesifik
+                            // Plot ke Layer Group
                             if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
                                 marker.addTo(layerTK);
                             } else if (bentuk === 'SMP') {
