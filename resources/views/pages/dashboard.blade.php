@@ -307,14 +307,14 @@
                         Raya</p>
                 </div>
                 <div class="flex items-center gap-3 text-[10px] text-slate-500">
-                    <span class="inline-flex items-center gap-1 font-semibold text-purple-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> TK/PAUD
-                    </span>
-                    <span class="inline-flex items-center gap-1 font-semibold text-blue-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> SD
-                    </span>
                     <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> SMP
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> TK/PAUD
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-semibold text-rose-600">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> SD
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-semibold text-blue-900">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-900"></span> SMP
                     </span>
                 </div>
             </div>
