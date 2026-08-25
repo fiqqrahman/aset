@@ -109,34 +109,33 @@
 
         </div>
 
-        <!-- SISI KKANAN (RUANG LUAS 9/12 SCREEN WITH CIRCULAR LOGO FRAME) -->
         <!-- SISI KANAN (RUANG LUAS 9/12 SCREEN WITH LARGER OPTIMIZED LOGO FRAME) -->
         <div class="hidden lg:flex lg:w-9/12 bg-slate-900 items-center justify-center p-12 relative overflow-hidden">
             
             <!-- Content Center -->
-            <div class="flex flex-col items-center text-center space-y-6 max-w-xl z-10">
-                
-                <!-- Frame Logo Pemko Bulat (Ukuran Diperbesar & Proper Fit) -->
-                <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-slate-800/40 border border-slate-700/60 shadow-2xl flex items-center justify-center p-4 backdrop-blur-md transition-all">
-                    <img src="{{ asset('img/logo-pemko.png') }}" 
-                         alt="Logo Pemko Palangka Raya" 
-                         class="w-full h-full object-contain filter drop-shadow-lg"
-                         onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Palangkaraya.png/250px-Lambang_Kota_Palangkaraya.png';">
-                </div>
-
+            <div class="flex flex-col items-center text-center space-y-6 max-w-2xl z-10">
+            
+                <!-- Frame Logo Pemko Bulat (Thin Amber/Yellow Outline Frame) -->
+<div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-slate-800/40 border-2 border-amber-400 p-4 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-amber-300 hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]">
+    <img src="{{ asset('img/logo-pemko.png') }}" 
+         alt="Logo Pemko Palangka Raya" 
+         class="w-full h-full object-contain filter drop-shadow-lg"
+         onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Palangkaraya.png/250px-Lambang_Kota_Palangkaraya.png';">
+</div>
+            
                 <!-- Text Identity -->
                 <div class="space-y-2 pt-2">
-                    <h2 class="text-3xl font-extrabold text-white tracking-wide uppercase">
+                    <h2 class="text-2xl xl:text-3xl font-extrabold text-white tracking-wide uppercase whitespace-nowrap">
                         Pemerintah Kota Palangka Raya
                     </h2>
-                    <p class="text-lg font-bold text-emerald-400 tracking-wider uppercase">
+                    <p class="text-base sm:text-lg font-bold text-emerald-400 tracking-wider uppercase">
                         Dinas Pendidikan
                     </p>
                 </div>
 
                 <!-- Divider & Description -->
                 <div class="w-20 h-0.5 bg-slate-800 my-2"></div>
-                <p class="text-base text-slate-400 leading-relaxed max-w-lg">
+                <p class="text-sm sm:text-base text-slate-400 leading-relaxed max-w-lg">
                     Sistem Informasi Pengelolaan & Pemetaan Aset Inventaris Sekolah Terpadu (SIP-ASET)
                 </p>
             </div>
