@@ -45,7 +45,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'NIP/Email atau kata sandi yang Antum masukkan tidak cocok.',
+            'email' => 'NIP/Email atau kata sandi tidak cocok.',
         ])->onlyInput('email');
     }
 
@@ -59,6 +59,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('status', 'Antum telah berhasil keluar dari sistem.');
+        return redirect()->route('login')->with('status', 'Berhasil Logout dari sistem.');
     }
 }
