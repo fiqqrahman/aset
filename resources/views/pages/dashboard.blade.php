@@ -321,11 +321,7 @@
             <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
                 <div id="map"></div>
             </div>
-        </div>
-
-       
-
-        
+        </div>     
     </div>
 @endsection
 
@@ -334,7 +330,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Leaflet GIS Map Init dengan Layer Per Jenjang dari sekolah.json
+            // 1. Leaflet GIS Map Init
             const map = L.map('map', {
                 zoomControl: true,
                 scrollWheelZoom: false
@@ -345,17 +341,66 @@
                 attribution: '&copy; OpenStreetMap'
             }).addTo(map);
 
-            // Layer Groups
+            // Layer Groups per Jenjang
             const layerTK = L.layerGroup();
             const layerSD = L.layerGroup();
             const layerSMP = L.layerGroup();
+
+            // Function Helper untuk Membuat Custom Icon Marker Leaflet (Khusus TK, SD, SMP)
+            function createCustomIcon(bentuk) {
+                let badgeBg = '';
+                let labelText = '';
+
+                if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
+                    badgeBg = '#a855f7'; // Purple TK/PAUD
+                    labelText = 'TK';
+                } else if (bentuk === 'SD') {
+                    badgeBg = '#2563eb'; // Blue SD
+                    labelText = 'SD';
+                } else if (bentuk === 'SMP') {
+                    badgeBg = '#059669'; // Emerald SMP
+                    labelText = 'SMP';
+                } else {
+                    // Abaikan dan buang jika bentuk pendidikan bukan TK, SD, atau SMP (No Slate Default)
+                    return null;
+                }
+
+                return L.divIcon({
+                    className: 'custom-map-pin',
+                    html: `
+                        <div style="
+                            background-color: ${badgeBg};
+                            color: #ffffff;
+                            font-size: 10px;
+                            font-weight: 800;
+                            padding: 2px 6px;
+                            border-radius: 12px;
+                            border: 2px solid #ffffff;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            gap: 3px;
+                            white-space: nowrap;
+                            font-family: 'Inter', sans-serif;
+                            transform: translate(-50%, -100%);
+                        ">
+                            <svg style="width: 12px; height: 12px; fill: currentColor;" viewBox="0 0 20 20">
+                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                            </svg>
+                            <span>${labelText}</span>
+                        </div>
+                    `,
+                    iconSize: [40, 24],
+                    iconAnchor: [20, 24],
+                    popupAnchor: [0, -26]
+                });
+            }
 
             // Fetch Data dari API Controller
             fetch("{{ route('admin.api.map-sekolah') }}")
                 .then(async response => {
                     const isJson = response.headers.get('content-type')?.includes('application/json');
                     const data = isJson ? await response.json() : null;
-
                     if (!response.ok) {
                         const errorMsg = (data && data.message) || response.statusText;
                         throw new Error(`HTTP ${response.status}: ${errorMsg}`);
@@ -368,57 +413,109 @@
                         return;
                     }
 
-                    console.log(`Berhasil memuat ${data.length} sekolah ke Peta!`);
-
                     data.forEach(item => {
-                        // Ambil koordinat lintang & bujur (Root or Child Node)
                         const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ?
                             item.sekolah[0] : (item.sekolah || {});
+                        const ruangNode = (Array.isArray(item.ruang) && item.ruang.length > 0) ?
+                            item.ruang[0] : (item.ruang || {});
+                        const ptkNode = (Array.isArray(item.ptk) && item.ptk.length > 0) ?
+                            item.ptk[0] : (item.ptk || {});
+                        const rasioNode = (Array.isArray(item.rasio_siswa) && item.rasio_siswa.length > 0) ?
+                            item.rasio_siswa[0] : (item.rasio_siswa || {});
 
                         const lat = parseFloat(item.lintang || sekolahNode.lintang || 0);
                         const lng = parseFloat(item.bujur || sekolahNode.bujur || 0);
 
                         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
                             const bentuk = (item.bentuk_pendidikan || '').toUpperCase();
-                            let markerColor = '#64748b';
+                            const customIcon = createCustomIcon(bentuk);
 
-                            if (['TK', 'PAUD', 'KB'].includes(bentuk)) {
-                                markerColor = '#a855f7';
+                            // Jika bukan jenjang TK/SD/SMP (customIcon === null), langsung lewati
+                            if (!customIcon) return;
+
+                            const marker = L.marker([lat, lng], { icon: customIcon });
+
+                            // Popup Content Tree View
+                            const popupContent = `
+                                <div style="font-family: 'Inter', sans-serif; width: 280px; max-height: 350px; overflow-y: auto; padding: 2px;">
+                                    <!-- Header Info Unit -->
+                                    <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 8px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                            <span style="font-size: 9px; font-weight: 800; background: #0f172a; color: #fff; padding: 1px 6px; border-radius: 4px;">${bentuk}</span>
+                                            <span style="font-size: 10px; font-weight: 600; color: #059669;">${item.status_sekolah || '-'}</span>
+                                        </div>
+                                        <h4 style="font-size: 12px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.3;">${item.nama || '-'}</h4>
+                                        <p style="font-size: 10px; color: #64748b; font-family: monospace; margin: 2px 0 0 0;">NPSN: ${item.npsn || '-'}</p>
+                                    </div>
+
+                                    <!-- Quick Summary Metrics -->
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 10px; background: #f8fafc; padding: 6px; border-radius: 6px; border: 1px solid #f1f5f9;">
+                                        <div style="text-align: center;">
+                                            <span style="font-size: 9px; color: #64748b; display: block;">Siswa</span>
+                                            <strong style="font-size: 11px; color: #0f172a;">${rasioNode.jml_pd ?? 0}</strong>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <span style="font-size: 9px; color: #64748b; display: block;">Kelas Baik</span>
+                                            <strong style="font-size: 11px; color: #059669;">${ruangNode.ruang_kelas_baik ?? 0}</strong>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <span style="font-size: 9px; color: #64748b; display: block;">PTK Total</span>
+                                            <strong style="font-size: 11px; color: #2563eb;">${(parseInt(ptkNode.ptk_guru_l || 0) + parseInt(ptkNode.ptk_guru_p || 0))}</strong>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tree View Hierarchy Asset Breakdown -->
+                                    <div style="font-size: 11px; color: #334155;">
+                                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; letter-spacing: 0.5px;">Struktur Aset Unit (Tree View)</div>
+                                        <ul style="list-style: none; padding-left: 0; margin: 0;">
+                                            <li style="margin-bottom: 4px;">
+                                                <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
+                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 KIB A - Tanah & Lahan</summary>
+                                                    <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
+                                                        <div>• Luas Lahan Milik: <strong>${sekolahNode.luas_tanah_milik ?? 0} m²</strong></div>
+                                                        <div>• Luas Lahan Bukan Milik: <strong>${sekolahNode.luas_tanah_bukan_milik ?? 0} m²</strong></div>
+                                                    </div>
+                                                </details>
+                                            </li>
+                                            <li style="margin-bottom: 4px;">
+                                                <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
+                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 KIB C - Gedung & Ruangan</summary>
+                                                    <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
+                                                        <div>• Ruang Kelas Baik: <strong>${ruangNode.ruang_kelas_baik ?? 0} unit</strong></div>
+                                                        <div>• Ruang Perpus Baik: <strong>${ruangNode.ruang_perpustakaan_baik ?? 0} unit</strong></div>
+                                                        <div>• R. Lab IPA / Komputer: <strong>${(ruangNode.ruang_lab_baik ?? 0)} unit</strong></div>
+                                                    </div>
+                                                </details>
+                                            </li>
+                                            <li style="margin-bottom: 4px;">
+                                                <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
+                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 Utilitas & Sarpras</summary>
+                                                    <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
+                                                        <div>• Pasokan Listrik: <strong>${sekolahNode.daya_listrik ?? 0} Watt</strong></div>
+                                                        <div>• Akses Internet: <strong>${sekolahNode.akses_internet ?? '-'}</strong></div>
+                                                        <div>• Alamat: <i>${item.alamat_jalan || '-'}, ${item.kecamatan || '-'}</i></div>
+                                                    </div>
+                                                </details>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            `;
+
+                            marker.bindPopup(popupContent, { maxWidth: 300 });
+
+                            // Masukkan ke Layer Group Spesifik
+                            if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
+                                marker.addTo(layerTK);
+                            } else if (bentuk === 'SMP') {
+                                marker.addTo(layerSMP);
                             } else if (bentuk === 'SD') {
-                                markerColor = '#3b82f6';
-                            } else if (bentuk === 'SMP') {
-                                markerColor = '#10b981';
-                            }
-
-                            const circleMarker = L.circleMarker([lat, lng], {
-                                radius: 6,
-                                fillColor: markerColor,
-                                color: '#ffffff',
-                                weight: 2,
-                                opacity: 1,
-                                fillOpacity: 0.9
-                            });
-
-                            circleMarker.bindPopup(`
-                    <div style="font-family: 'Inter', sans-serif; font-size: 11px; padding: 2px;">
-                        <strong style="font-size: 12px; color: #0f172a; display: block; margin-bottom: 4px;">${item.nama || '-'}</strong>
-                        <span style="color: #475569; display: block;">NPSN: <strong>${item.npsn || '-'}</strong></span>
-                        <span style="color: #64748b; font-size: 10px; font-family: monospace; display: block; margin-top: 4px;">
-                            Lat: ${lat.toFixed(6)} | Lng: ${lng.toFixed(6)}
-                        </span>
-                    </div>
-                `);
-
-                            if (['TK', 'PAUD', 'KB'].includes(bentuk)) {
-                                circleMarker.addTo(layerTK);
-                            } else if (bentuk === 'SMP') {
-                                circleMarker.addTo(layerSMP);
-                            } else {
-                                circleMarker.addTo(layerSD);
+                                marker.addTo(layerSD);
                             }
                         }
                     });
 
+                    // Render Layer ke Peta
                     layerTK.addTo(map);
                     layerSD.addTo(map);
                     layerSMP.addTo(map);
@@ -429,13 +526,9 @@
                         "<span style='font-size:11px; font-weight:600;'>Jenjang SMP</span>": layerSMP
                     };
 
-                    L.control.layers(null, overlayMaps, {
-                        collapsed: false
-                    }).addTo(map);
+                    L.control.layers(null, overlayMaps, { collapsed: false }).addTo(map);
                 })
-                .catch(err => {
-                    console.error("DETAIL ERROR MAP:", err.message);
-                });
+                .catch(err => console.error("DETAIL ERROR MAP:", err.message));
 
             // 2. Chart.js Asset Growth Init
             const ctx = document.getElementById('assetGrowthChart').getContext('2d');
@@ -469,32 +562,20 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
+                            grid: { display: false },
                             ticks: {
-                                font: {
-                                    size: 10,
-                                    family: 'Inter'
-                                },
+                                font: { size: 10, family: 'Inter' },
                                 color: '#64748b'
                             }
                         },
                         y: {
-                            grid: {
-                                color: '#f1f5f9'
-                            },
+                            grid: { color: '#f1f5f9' },
                             ticks: {
-                                font: {
-                                    size: 10,
-                                    family: 'Inter'
-                                },
+                                font: { size: 10, family: 'Inter' },
                                 color: '#64748b',
                                 callback: function(value) {
                                     return 'Rp ' + value + 'M';
