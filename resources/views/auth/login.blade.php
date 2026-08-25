@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id" class="h-full bg-slate-50">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,27 +10,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
+
 <body class="h-full text-slate-800 antialiased selection:bg-slate-200">
 
     <div class="min-h-screen flex">
-        
+
         <!-- SISI KIRI (FORM PANEL - 3/12 SCREEN FULL CONTAINER) -->
         <div class="w-full lg:w-3/12 bg-white flex flex-col justify-between p-6 sm:p-8 z-10 border-r border-slate-200">
-            
+
             <!-- Main Form (Memenuhi Container Kiri) -->
             <div class="my-auto py-4 w-full space-y-6">
-                
+
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Selamat Datang</h2>
-                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Masukkan NIP / Email dinas dan kata sandi Antum untuk masuk ke sistem.</p>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Masukkan NIP / Email dinas dan kata sandi
+                        Antum untuk masuk ke sistem.</p>
                 </div>
 
                 <!-- Session Flash Messages -->
                 @if (session('status'))
-                    <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 font-medium">
+                    <div
+                        class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 font-medium">
                         {{ session('status') }}
                     </div>
                 @endif
@@ -51,13 +57,17 @@
 
                     <!-- Input NIP / Email -->
                     <div class="w-full">
-                        <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">NIP / Email Official</label>
+                        <label for="email"
+                            class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">NIP / Email
+                            Official</label>
                         <div class="relative w-full">
-                            <input type="text" id="email" name="email" value="{{ old('email') }}" required autofocus
-                                placeholder="19880312... atau admin@palangkaraya.go.id"
+                            <input type="text" id="email" name="email" value="{{ old('email') }}" required
+                                autofocus placeholder="19880312... atau admin@palangkaraya.go.id"
                                 class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:border-slate-400 focus:outline-none transition-all placeholder:text-slate-400 text-slate-900 font-medium shadow-sm">
-                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
                         </div>
                     </div>
@@ -65,19 +75,23 @@
                     <!-- Input Password -->
                     <div class="w-full">
                         <div class="flex items-center justify-between mb-1.5">
-                            <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kata Sandi</label>
+                            <label for="password"
+                                class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kata
+                                Sandi</label>
                             @if (Route::has('password.request'))
-                                <a href="#" class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold hover:underline">
+                                <a href="#"
+                                    class="text-xs text-emerald-600 hover:text-emerald-700 font-semibold hover:underline">
                                     Lupa sandi?
                                 </a>
                             @endif
                         </div>
                         <div class="relative w-full">
-                            <input type="password" id="password" name="password" required
-                                placeholder="••••••••"
+                            <input type="password" id="password" name="password" required placeholder="••••••••"
                                 class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:border-slate-400 focus:outline-none transition-all placeholder:text-slate-400 text-slate-900 font-medium shadow-sm">
-                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
                     </div>
@@ -85,17 +99,20 @@
                     <!-- Remember Me Option -->
                     <div class="flex items-center justify-between pt-1">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" name="remember" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                            <input type="checkbox" name="remember"
+                                class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
                             <span class="text-xs text-slate-600 font-medium">Ingat sesi saya</span>
                         </label>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                         class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 group mt-2">
                         <span>Masuk ke Dashboard</span>
-                        <svg class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </button>
                 </form>
@@ -111,21 +128,22 @@
 
         <!-- SISI KANAN (RUANG LUAS 9/12 SCREEN WITH LARGER OPTIMIZED LOGO FRAME) -->
         <div class="hidden lg:flex lg:w-9/12 bg-slate-900 items-center justify-center p-12 relative overflow-hidden">
-            
+
             <!-- Content Center -->
             <div class="flex flex-col items-center text-center space-y-6 max-w-2xl z-10">
-            
+
                 <!-- Frame Logo Pemko Bulat (Thin Amber/Yellow Outline Frame) -->
-<div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-slate-800/40 border-2 border-amber-400 p-4 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-amber-300 hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]">
-    <img src="{{ asset('img/logo-pemko.png') }}" 
-         alt="Logo Pemko Palangka Raya" 
-         class="w-full h-full object-contain filter drop-shadow-lg"
-         onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Palangkaraya.png/250px-Lambang_Kota_Palangkaraya.png';">
-</div>
-            
+                <div
+                    class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-slate-800/40 border-2 border-amber-400 p-4 backdrop-blur-md shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 hover:border-amber-300 hover:shadow-[0_0_25px_rgba(251,191,36,0.35)]">
+                    <img src="{{ asset('img/logo-pemko.png') }}" alt="Logo Pemko Palangka Raya"
+                        class="w-full h-full object-contain filter drop-shadow-lg"
+                        onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Lambang_Kota_Palangkaraya.png/250px-Lambang_Kota_Palangkaraya.png';">
+                </div>
+
                 <!-- Text Identity -->
                 <div class="space-y-2 pt-2">
-                    <h2 class="text-2xl xl:text-3xl font-extrabold text-white tracking-wide uppercase whitespace-nowrap">
+                    <h2
+                        class="text-2xl xl:text-3xl font-extrabold text-white tracking-wide uppercase whitespace-nowrap">
                         Pemerintah Kota Palangka Raya
                     </h2>
                     <p class="text-base sm:text-lg font-bold text-emerald-400 tracking-wider uppercase">
@@ -145,4 +163,5 @@
     </div>
 
 </body>
+
 </html>
