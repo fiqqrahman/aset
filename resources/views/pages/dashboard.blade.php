@@ -120,7 +120,7 @@
                     </span>
                 </div>
             </div>
-            <div class="h-[220px] w-full pt-2">
+            <div class="h-[calc(220px)] w-full pt-2">
                 <canvas id="assetGrowthChart"></canvas>
             </div>
         </div>
@@ -298,7 +298,7 @@
         </div>
 
         <!-- Bento Row 2: GIS Map Container -->
-        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[600px]">
+        <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[calc(600px)]">
             <div class="flex items-center justify-between mb-3">
                 <div>
                     <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
