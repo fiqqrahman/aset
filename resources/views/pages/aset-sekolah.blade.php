@@ -38,8 +38,24 @@
         </div>
     </div>
 
-    <!-- Metrics Summary Rows (Bento Cards Dinamis Lintas Jenjang) -->
+    @php
+        // Perhitungan Sederhana Statistik Koordinat
+        $validCoords = 0;
+        $invalidCoords = 0;
+        foreach ($sekolah as $item) {
+            $lat = (float) ($item['lintang'] ?? ($item['sekolah']['lintang'] ?? 0));
+            $lng = (float) ($item['bujur'] ?? ($item['sekolah']['bujur'] ?? 0));
+            if ($lat != 0 && $lng != 0) {
+                $validCoords++;
+            } else {
+                $invalidCoords++;
+            }
+        }
+    @endphp
+
+    <!-- Metrics Summary Rows (Bento Cards Re-structured) -->
     <div class="grid grid-cols-12 gap-4 mb-4">
+        <!-- Card 1: Total Unit Terdata -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
@@ -53,14 +69,16 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-slate-900 mt-1">{{ $metrics['total_sekolah'] }} Unit</p>
+                <p class="text-xl font-bold text-slate-900 mt-1">{{ $metrics['total_sekolah'] ?? $sekolah->total() }} Unit
+                </p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>TK / SD / SMP</span>
-                <span class="font-medium text-emerald-600">Palangka Raya</span>
+                <span>Wilayah Administrasi</span>
+                <span class="font-medium text-emerald-600">Kota Palangka Raya</span>
             </div>
         </div>
 
+        <!-- Card 2: Sekolah Negeri -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
@@ -69,18 +87,19 @@
                     <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-emerald-600 mt-1">{{ $metrics['negeri'] }} Sekolah</p>
+                <p class="text-xl font-bold text-emerald-600 mt-1">{{ $metrics['negeri'] ?? 0 }} Unit</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Aset Pemda</span>
-                <span class="font-medium text-slate-700">Terverifikasi</span>
+                <span>Status Kelembagaan</span>
+                <span class="font-medium text-emerald-600">Negeri</span>
             </div>
         </div>
 
+        <!-- Card 3: Sekolah Swasta -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
@@ -93,34 +112,39 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-blue-600 mt-1">{{ $metrics['swasta'] }} Sekolah</p>
+                <p class="text-xl font-bold text-blue-600 mt-1">{{ $metrics['swasta'] ?? 0 }} Unit</p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Hibah / Mandiri</span>
-                <span class="font-medium text-slate-700">Terdaftar API</span>
+                <span>Status Kelembagaan</span>
+                <span class="font-medium text-blue-600">Swasta</span>
             </div>
         </div>
 
+        <!-- Card 4: Status Pemetaan Koordinat (Gabungan Valid & Belum Valid) -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
                 <div class="flex items-center justify-between">
-                    <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Akreditasi Unggulan
-                        (A)</span>
+                    <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Status Pemetaan
+                        Koordinat</span>
                     <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </div>
                 </div>
-                <p class="text-xl font-bold text-slate-900 mt-1">{{ $metrics['akred_a'] }} Sekolah</p>
+                <p class="text-xl font-bold text-slate-900 mt-1">
+                    <span class="text-emerald-600">{{ $validCoords }} Valid</span>
+                    <span class="text-slate-300 font-normal">/</span>
+                    <span class="text-rose-600">{{ $invalidCoords }} Belum</span>
+                </p>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Rasio Standar Sarpras</span>
-                <span class="font-medium text-amber-600">
-                    {{ $metrics['total_sekolah'] > 0 ? round(($metrics['akred_a'] / $metrics['total_sekolah']) * 100, 1) : 0 }}%
-                </span>
+                <span>Posisi Peta GIS</span>
+                <span class="font-medium text-slate-700">Valid vs Belum Valid</span>
             </div>
         </div>
     </div>
@@ -189,11 +213,17 @@
                             <th class="py-3 px-4">Nama Unit Sekolah</th>
                             <th class="py-3 px-4">Jenjang & Status</th>
                             <th class="py-3 px-4">Kecamatan / Alamat</th>
+                            <th class="py-3 px-4">Koordinat (Lat, Lng)</th>
                             <th class="py-3 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-xs">
                         @forelse($sekolah as $item)
+                            @php
+                                $lat = $item['lintang'] ?? ($item['sekolah']['lintang'] ?? 0);
+                                $lng = $item['bujur'] ?? ($item['sekolah']['bujur'] ?? 0);
+                                $isValidCoord = (float) $lat != 0 && (float) $lng != 0;
+                            @endphp
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <td class="py-3.5 px-4 font-mono font-semibold text-slate-700">
                                     {{ $item['npsn'] ?? '-' }}
@@ -225,19 +255,35 @@
                                         {{ $item['alamat_jalan'] ?? '-' }}
                                     </div>
                                 </td>
+                                <td class="py-3.5 px-4 font-mono">
+                                    @if ($isValidCoord)
+                                        <div class="text-slate-700 text-[11px] font-medium">{{ $lat }},
+                                            {{ $lng }}</div>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            Valid
+                                        </span>
+                                    @else
+                                        <div class="text-rose-500 text-[11px] font-medium">0, 0</div>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                            Belum Valid
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="py-3.5 px-4 text-right">
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <!-- Tombol Detail Aset (Icon Minimalis) -->
-                                        <button type="button" title="Detail Aset Unit"
-                                            class="p-1.5 text-emerald-700 hover:bg-emerald-50 rounded-lg border border-emerald-200 transition-colors shadow-sm">
+                                        <!-- Tombol Edit Data & Koordinat -->
+                                        <button type="button" title="Edit Data & Koordinat Sekolah"
+                                            onclick="openEditModal('{{ $item['sekolah_id'] }}', {{ json_encode($item) }})"
+                                            class="p-1.5 text-amber-700 hover:bg-amber-50 rounded-lg border border-amber-200 transition-colors shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-
-                                        <!-- Tombol Detail Sekolah / Full Detail (Icon Minimalis) -->
+                                        <!-- Tombol Full Detail Sekolah -->
                                         <button type="button" title="Informasi Full Detail Sekolah"
                                             onclick="openDetailModal('{{ $item['sekolah_id'] }}', {{ json_encode($item) }})"
                                             class="p-1.5 text-blue-700 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors shadow-sm">
@@ -254,7 +300,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-8 text-center text-slate-400 text-xs">
+                                <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
                                     Data unit sekolah tidak ditemukan. Coba ubah kata kunci pencarian/filter.
                                 </td>
                             </tr>
@@ -273,12 +319,11 @@
         </div>
     </div>
 
-    <!-- Modal Full Detail Sekolah (Minimalis UI Pop-up) -->
+    <!-- Modal Full Detail Sekolah -->
     <div id="schoolDetailModal"
         class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm items-center justify-center p-4">
         <div
             class="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
-            <!-- Modal Header -->
             <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <div>
                     <h3 id="modalTitle" class="text-sm font-bold text-slate-900">Detail Informasi Sekolah</h3>
@@ -291,18 +336,84 @@
                     </svg>
                 </button>
             </div>
-            <!-- Modal Body -->
             <div class="p-5 overflow-y-auto space-y-4 text-xs">
-                <!-- Dynamic Content Container -->
                 <div id="modalBodyContent"></div>
             </div>
-            <!-- Modal Footer -->
             <div class="p-3 border-t border-slate-100 bg-slate-50 flex justify-end">
                 <button onclick="closeDetailModal()"
                     class="px-3 py-1.5 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors">
                     Tutup
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Data & Koordinat Sekolah -->
+    <div id="schoolEditModal"
+        class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">Edit Informasi & Koordinat Sekolah</h3>
+                    <p id="editModalSub" class="text-[11px] text-slate-500 font-mono"></p>
+                </div>
+                <button onclick="closeEditModal()"
+                    class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-200/50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="editSekolahForm" method="POST" action="" class="p-5 space-y-3 text-xs">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Sekolah / Unit</label>
+                    <input type="text" id="edit_nama" name="nama" required
+                        class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">NPSN</label>
+                        <input type="text" id="edit_npsn" name="npsn" required
+                            class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono focus:outline-none focus:border-slate-400">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kecamatan</label>
+                        <input type="text" id="edit_kecamatan" name="kecamatan" required
+                            class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Alamat Jalan</label>
+                    <input type="text" id="edit_alamat_jalan" name="alamat_jalan"
+                        class="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400">
+                </div>
+                <!-- Input Koordinat Geospasial -->
+                <div class="p-3 bg-amber-50/60 rounded-lg border border-amber-200 space-y-2">
+                    <span class="block text-[11px] font-bold text-amber-900 uppercase">Perbaikan Titik Koordinat
+                        (GIS)</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Latitude (Lintang)</label>
+                            <input type="text" id="edit_lintang" name="lintang" placeholder="-2.2096" required
+                                class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono focus:outline-none focus:border-slate-400 bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Longitude (Bujur)</label>
+                            <input type="text" id="edit_bujur" name="bujur" placeholder="113.9145" required
+                                class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono focus:outline-none focus:border-slate-400 bg-white">
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" onclick="closeEditModal()"
+                        class="px-3 py-1.5 font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors">Batal</button>
+                    <button type="submit"
+                        class="px-4 py-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm">Simpan
+                        Pembaruan</button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -322,51 +433,93 @@
             const r = item.ruang || {};
             const p = item.ptk || {};
             const rs = item.rasio_siswa || {};
+            const lat = item.lintang || s.lintang || 0;
+            const lng = item.bujur || s.bujur || 0;
 
-            modalBody.innerHTML = `
-            <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Status / Akreditasi</span> <span class="font-semibold text-slate-800">${item.status_sekolah || '-'} / Akred ${item.akreditasi || '-'}</span></div>
-                <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Kecamatan</span> <span class="font-semibold text-slate-800">${item.kecamatan || '-'}</span></div>
-                <div class="col-span-2"><span class="text-slate-400 block text-[10px] uppercase font-bold">Alamat Jalan</span> <span class="font-semibold text-slate-800">${item.alamat_jalan || '-'}</span></div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 pt-2">
-                <div class="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">
-                    <span class="text-emerald-600 block text-[10px] font-bold uppercase">Luas Tanah Milik</span>
-                    <span class="text-sm font-bold text-slate-900">${s.luas_tanah_milik ?? 0} m²</span>
+            modalBody.innerHTML = `             
+                <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">                 
+                    <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Status / Akreditasi</span> <span class="font-semibold text-slate-800">${item.status_sekolah || '-'} / Akred ${item.akreditasi || '-'}</span></div>                 
+                    <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Kecamatan</span> <span class="font-semibold text-slate-800">${item.kecamatan || '-'}</span></div>                 
+                    <div class="col-span-2"><span class="text-slate-400 block text-[10px] uppercase font-bold">Alamat Jalan</span> <span class="font-semibold text-slate-800">${item.alamat_jalan || '-'}</span></div>             
+                </div>             
+                
+                <!-- Section Detail Koordinat Geospasial -->
+                <div class="p-3 bg-slate-900 text-white rounded-lg flex items-center justify-between">
+                    <div>
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Titik Koordinat Lokasi (GIS)</span>
+                        <span class="font-mono font-semibold text-xs text-amber-400">${lat}, ${lng}</span>
+                    </div>
+                    <div>
+                        ${((parseFloat(lat) !== 0 && parseFloat(lng) !== 0)) 
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Terpetakan Presisi</span>` 
+                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Belum Ada Titik</span>`
+                        }
+                    </div>
                 </div>
-                <div class="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
-                    <span class="text-blue-600 block text-[10px] font-bold uppercase">Daya Listrik</span>
-                    <span class="text-sm font-bold text-slate-900">${s.daya_listrik ?? 0} Watt</span>
-                </div>
-                <div class="p-2.5 bg-amber-50/50 rounded-lg border border-amber-100">
-                    <span class="text-amber-600 block text-[10px] font-bold uppercase">Jumlah Peserta Didik</span>
-                    <span class="text-sm font-bold text-slate-900">${rs.jml_pd ?? 0} Siswa</span>
-                </div>
-            </div>
 
-            <div class="pt-2">
-                <h4 class="font-bold text-slate-900 mb-1.5 uppercase text-[10px] tracking-wider text-slate-400">Fasilitas Ruang Kelas & PTK</h4>
-                <div class="grid grid-cols-2 gap-2 text-[11px]">
-                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Kelas Baik:</span> <strong class="text-slate-800">${r.ruang_kelas_baik ?? 0}</strong></div>
-                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Perpustakaan:</span> <strong class="text-slate-800">${r.ruang_perpustakaan_baik ?? 0}</strong></div>
-                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Laki-laki:</span> <strong class="text-slate-800">${p.ptk_guru_l ?? 0} Orang</strong></div>
-                    <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Perempuan:</span> <strong class="text-slate-800">${p.ptk_guru_p ?? 0} Orang</strong></div>
-                </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500">
-                <span>Email: <strong class="text-slate-700">${s.email || '-'}</strong></span>
-                <span>Telepon: <strong class="text-slate-700">${s.nomor_telepon || '-'}</strong></span>
-            </div>
-        `;
-
+                <div class="grid grid-cols-3 gap-3 pt-2">                 
+                    <div class="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">                     
+                        <span class="text-emerald-600 block text-[10px] font-bold uppercase">Luas Tanah Milik</span>                     
+                        <span class="text-sm font-bold text-slate-900">${s.luas_tanah_milik ?? 0} m²</span>                 
+                    </div>                 
+                    <div class="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">                     
+                        <span class="text-blue-600 block text-[10px] font-bold uppercase">Daya Listrik</span>                     
+                        <span class="text-sm font-bold text-slate-900">${s.daya_listrik ?? 0} Watt</span>                 
+                    </div>                 
+                    <div class="p-2.5 bg-amber-50/50 rounded-lg border border-amber-100">                     
+                        <span class="text-amber-600 block text-[10px] font-bold uppercase">Jumlah Peserta Didik</span>                     
+                        <span class="text-sm font-bold text-slate-900">${rs.jml_pd ?? 0} Siswa</span>                 
+                    </div>             
+                </div>             
+                
+                <div class="pt-2">                 
+                    <h4 class="font-bold text-slate-900 mb-1.5 uppercase text-[10px] tracking-wider text-slate-400">Fasilitas Ruang Kelas & PTK</h4>                 
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">                     
+                        <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Kelas Baik:</span> <strong class="text-slate-800">${r.ruang_kelas_baik ?? 0}</strong></div>                     
+                        <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Perpustakaan:</span> <strong class="text-slate-800">${r.ruang_perpustakaan_baik ?? 0}</strong></div>                     
+                        <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Laki-laki:</span> <strong class="text-slate-800">${p.ptk_guru_l ?? 0} Orang</strong></div>                     
+                        <div class="flex justify-between p-2 bg-slate-50 rounded"><span>PTK Perempuan:</span> <strong class="text-slate-800">${p.ptk_guru_p ?? 0} Orang</strong></div>                 
+                    </div>             
+                </div>             
+                
+                <div class="pt-2 border-t border-slate-100 flex justify-between text-[11px] text-slate-500">                 
+                    <span>Email: <strong class="text-slate-700">${s.email || '-'}</strong></span>                 
+                    <span>Telepon: <strong class="text-slate-700">${s.nomor_telepon || '-'}</strong></span>             
+                </div>         
+            `;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
 
         function closeDetailModal() {
             const modal = document.getElementById('schoolDetailModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function openEditModal(sekolahId, item) {
+            const modal = document.getElementById('schoolEditModal');
+            const editForm = document.getElementById('editSekolahForm');
+            const editModalSub = document.getElementById('editModalSub');
+
+            editModalSub.textContent = `ID: ${sekolahId}`;
+            editForm.action = `/admin/aset-sekolah/${sekolahId}`;
+
+            document.getElementById('edit_nama').value = item.nama || '';
+            document.getElementById('edit_npsn').value = item.npsn || '';
+            document.getElementById('edit_kecamatan').value = item.kecamatan || '';
+            document.getElementById('edit_alamat_jalan').value = item.alamat_jalan || '';
+
+            const s = item.sekolah || {};
+            document.getElementById('edit_lintang').value = item.lintang || s.lintang || '';
+            document.getElementById('edit_bujur').value = item.bujur || s.bujur || '';
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('schoolEditModal');
             modal.classList.remove('flex');
             modal.classList.add('hidden');
         }
