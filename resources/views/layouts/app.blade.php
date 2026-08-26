@@ -46,6 +46,9 @@
 </head>
 
 <body class="h-full text-slate-800 antialiased selection:bg-slate-200 overflow-hidden">
+
+    @include('components.toast')
+
     <!-- h-screen & overflow-hidden mengunci layar agar tidak scroll sebadan-badan -->
     <div class="h-screen flex overflow-hidden">
 
