@@ -68,7 +68,7 @@ class C_MasterSekolah extends Controller
         return view('pages.aset-sekolah', compact('sekolah', 'metrics', 'listKecamatan', 'listJenjang'));
     }
 
- 
+    //  Master Unit
     public function masterUnit()
     {
         $jsonDir  = storage_path('json');
@@ -118,20 +118,25 @@ class C_MasterSekolah extends Controller
         ]);
     }
    
-    public function syncStream()
+    // Live Sync
+    public function syncStream(Request $request)
     {
         set_time_limit(600);
         ini_set('memory_limit', '512M');
 
-        return response()->stream(function () {
+        // Parse query parameter 'fields' yang dikirim dari UI master-unit.blade.php
+        $selectedFields = $request->query('fields') ? explode(',', $request->query('fields')) : [];
+
+        return response()->stream(function () use ($selectedFields) {
             $headers = [
                 'User-Agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                 'Accept'       => 'application/json',
                 'Referer'      => 'https://sekolah.data.kemendikdasmen.go.id/',
             ];
 
-            $jsonDir = storage_path('json');
+            $jsonDir    = storage_path('json');
             $sourceFile = $jsonDir . '/meta-data.json';
+            $targetFile = $jsonDir . '/sekolah.json';
 
             if (!File::exists($sourceFile)) {
                 echo "data: " . json_encode(['error' => 'File meta-data.json tidak ditemukan!']) . "\n\n";
@@ -140,13 +145,24 @@ class C_MasterSekolah extends Controller
                 return;
             }
 
-            $rawContent = File::get($sourceFile);
-            $decoded = json_decode($rawContent, true) ?? [];
-            $listSekolah = $decoded['data'] ?? $decoded;
-            $totalSekolah = count($listSekolah);
+            // 1. BACA DATA LOKAL EKSISTING UNTUK CEK FLAG OVERRIDE MANUAL
+            $existingData = [];
+            if (File::exists($targetFile)) {
+                $rawTarget    = File::get($targetFile);
+                $decodedTarget = json_decode($rawTarget, true) ?? [];
+                $listTarget   = $decodedTarget['data'] ?? $decodedTarget;
+                if (is_array($listTarget)) {
+                    // Indexing berdasarkan sekolah_id agar pencarian O(1)
+                    $existingData = collect($listTarget)->keyBy('sekolah_id')->all();
+                }
+            }
 
+            $rawContent   = File::get($sourceFile);
+            $decoded      = json_decode($rawContent, true) ?? [];
+            $listSekolah  = $decoded['data'] ?? $decoded;
+            $totalSekolah = count($listSekolah);
             $masterDataMerged = [];
-            $processed = 0;
+            $processed    = 0;
 
             foreach ($listSekolah as $index => $itemUmum) {
                 $sekolahId = $itemUmum['sekolah_id'] ?? null;
@@ -161,6 +177,8 @@ class C_MasterSekolah extends Controller
                     'akreditasi'        => $itemUmum['akreditasi'] ?? '-',
                     'alamat_jalan'      => $itemUmum['alamat_jalan'] ?? '-',
                     'kecamatan'         => $itemUmum['kecamatan'] ?? '-',
+                    'lintang'           => (float) ($itemUmum['lintang'] ?? 0),
+                    'bujur'             => (float) ($itemUmum['bujur'] ?? 0),
                     'sekolah'           => [],
                     'ruang'             => [],
                     'ptk'               => [],
@@ -186,14 +204,53 @@ class C_MasterSekolah extends Controller
                             $sekolahNode['npsn']          = $d['npsn'] ?? $sekolahNode['npsn'];
                             $sekolahNode['status_sekolah'] = $d['status_sekolah'] ?? $sekolahNode['status_sekolah'];
                             $sekolahNode['kecamatan']     = $d['kecamatan'] ?? $sekolahNode['kecamatan'];
+                            
+                            // Ambil lintang bujur dari detail jika ada
+                            if (isset($d['lintang']) && isset($d['bujur'])) {
+                                $sekolahNode['lintang'] = (float) $d['lintang'];
+                                $sekolahNode['bujur']   = (float) $d['bujur'];
+                            }
                         }
                     }
                 } catch (\Exception $e) {
+                    // Fail gracefully jika API timeout
                 }
 
-                $masterDataMerged[$sekolahId] = $sekolahNode;
+                // 2. CEK PROTEKSI MANUAL OVERRIDE BILA SUDAH DIEDIT LOKAL
+                if (isset($existingData[$sekolahId])) {
+                    $localItem = $existingData[$sekolahId];
+
+                    if (!empty($localItem['is_manual_override'])) {
+                        // Pertahankan nilai koordinat & data editan manual
+                        $sekolahNode['lintang']            = (float) $localItem['lintang'];
+                        $sekolahNode['bujur']              = (float) $localItem['bujur'];
+                        $sekolahNode['nama']               = $localItem['nama'] ?? $sekolahNode['nama'];
+                        $sekolahNode['npsn']               = $localItem['npsn'] ?? $sekolahNode['npsn'];
+                        $sekolahNode['kecamatan']          = $localItem['kecamatan'] ?? $sekolahNode['kecamatan'];
+                        $sekolahNode['alamat_jalan']       = $localItem['alamat_jalan'] ?? $sekolahNode['alamat_jalan'];
+                        $sekolahNode['is_manual_override'] = true;
+                        $sekolahNode['manual_updated_at']  = $localItem['manual_updated_at'] ?? null;
+
+                        // Pertahankan juga sub-node sekolah jika ada
+                        if (isset($sekolahNode['sekolah']) && is_array($sekolahNode['sekolah'])) {
+                            if (array_is_list($sekolahNode['sekolah']) && !empty($sekolahNode['sekolah'])) {
+                                $sekolahNode['sekolah'][0]['lintang'] = (float) $localItem['lintang'];
+                                $sekolahNode['sekolah'][0]['bujur']   = (float) $localItem['bujur'];
+                            } else {
+                                $sekolahNode['sekolah']['lintang'] = (float) $localItem['lintang'];
+                                $sekolahNode['sekolah']['bujur']   = (float) $localItem['bujur'];
+                            }
+                        }
+                    }
+                }
+
+                // 3. FILTER FIELD BERDASARKAN SELECTOR PADA UI MASTER-UNIT
+                $finalDataNode = $this->filterFields($sekolahNode, $selectedFields);
+
+                $masterDataMerged[$sekolahId] = $finalDataNode;
                 $processed++;
                 $percentage = round(($processed / $totalSekolah) * 100);
+
                 echo "data: " . json_encode([
                     'current'    => $processed,
                     'total'      => $totalSekolah,
@@ -205,26 +262,26 @@ class C_MasterSekolah extends Controller
 
                 ob_flush();
                 flush();
-
                 usleep(250000); 
             }
 
+            // 4. SIMPAN KEMBALI HASIL SINKRONISASI DENGAN PRESERVED OVERRIDE
             File::put(
-                $jsonDir . '/sekolah.json',
+                $targetFile,
                 json_encode([
                     'status'     => 'success',
                     'total'      => count($masterDataMerged),
                     'updated_at' => date('Y-m-d H:i:s'),
                     'data'       => array_values($masterDataMerged)
-                ], JSON_PRETTY_PRINT)
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
             );
 
             echo "data: " . json_encode(['complete' => true]) . "\n\n";
             ob_flush();
             flush();
         }, 200, [
-            'Cache-Control' => 'no-cache',
-            'Content-Type'  => 'text/event-stream',
+            'Cache-Control'     => 'no-cache',
+            'Content-Type'      => 'text/event-stream',
             'X-Accel-Buffering' => 'no'
         ]);
     }
