@@ -53,7 +53,7 @@
         }
     @endphp
 
-    <!-- Metrics Summary Rows (Bento Cards Re-structured) -->
+    <!-- Metrics Summary Rows (Bento Cards) -->
     <div class="grid grid-cols-12 gap-4 mb-4">
         <!-- Card 1: Total Unit Terdata -->
         <div
@@ -120,7 +120,7 @@
             </div>
         </div>
 
-        <!-- Card 4: Status Pemetaan Koordinat (Gabungan Valid & Belum Valid) -->
+        <!-- Card 4: Status Pemetaan Koordinat -->
         <div
             class="col-span-12 md:col-span-3 bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
             <div>
@@ -336,7 +336,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="p-5 overflow-y-auto space-y-4 text-xs">
+            <div class="p-5 overflow-y-auto text-xs">
                 <div id="modalBodyContent"></div>
             </div>
             <div class="p-3 border-t border-slate-100 bg-slate-50 flex justify-end">
@@ -437,27 +437,27 @@
             const lng = item.bujur || s.bujur || 0;
 
             modalBody.innerHTML = `             
-                <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">                 
+                <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 mb-3">                 
                     <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Status / Akreditasi</span> <span class="font-semibold text-slate-800">${item.status_sekolah || '-'} / Akred ${item.akreditasi || '-'}</span></div>                 
                     <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Kecamatan</span> <span class="font-semibold text-slate-800">${item.kecamatan || '-'}</span></div>                 
                     <div class="col-span-2"><span class="text-slate-400 block text-[10px] uppercase font-bold">Alamat Jalan</span> <span class="font-semibold text-slate-800">${item.alamat_jalan || '-'}</span></div>             
                 </div>             
                 
-                <!-- Section Detail Koordinat Geospasial -->
-                <div class="p-3 bg-slate-900 text-white rounded-lg flex items-center justify-between">
+                <!-- Section Detail Koordinat Geospasial (Sudah diberi Spacing mb-3 agar lega) -->
+                <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-between mb-3 shadow-sm">
                     <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Titik Koordinat Lokasi (GIS)</span>
-                        <span class="font-mono font-semibold text-xs text-amber-400">${lat}, ${lng}</span>
+                        <span class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Titik Koordinat Lokasi (GIS)</span>
+                        <span class="font-mono font-bold text-xs text-slate-800">${lat}, ${lng}</span>
                     </div>
                     <div>
                         ${((parseFloat(lat) !== 0 && parseFloat(lng) !== 0)) 
-                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Terpetakan Presisi</span>` 
-                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Belum Ada Titik</span>`
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Terpetakan Presisi</span>` 
+                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">Belum Ada Titik</span>`
                         }
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3 pt-2">                 
+                <div class="grid grid-cols-3 gap-3 mb-3">                 
                     <div class="p-2.5 bg-emerald-50/50 rounded-lg border border-emerald-100">                     
                         <span class="text-emerald-600 block text-[10px] font-bold uppercase">Luas Tanah Milik</span>                     
                         <span class="text-sm font-bold text-slate-900">${s.luas_tanah_milik ?? 0} m²</span>                 
@@ -472,7 +472,7 @@
                     </div>             
                 </div>             
                 
-                <div class="pt-2">                 
+                <div class="mb-3">                 
                     <h4 class="font-bold text-slate-900 mb-1.5 uppercase text-[10px] tracking-wider text-slate-400">Fasilitas Ruang Kelas & PTK</h4>                 
                     <div class="grid grid-cols-2 gap-2 text-[11px]">                     
                         <div class="flex justify-between p-2 bg-slate-50 rounded"><span>Ruang Kelas Baik:</span> <strong class="text-slate-800">${r.ruang_kelas_baik ?? 0}</strong></div>                     
