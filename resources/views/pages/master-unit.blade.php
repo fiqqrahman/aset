@@ -324,7 +324,7 @@
             </div>
         </div>
 
-        <!-- Right Column: Tabel Log Riwayat Pipeline Ingestion -->
+        <!-- Right Column: Tabel Log Riwayat Pipeline Ingestion (Disesuaikan Lebar Kolomnya) -->
         <div
             class="col-span-12 lg:col-span-7 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between">
             <div>
@@ -337,25 +337,33 @@
                     <span class="text-[11px] font-mono text-slate-400">Log Live: ACTIVE</span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-[calc(640px)]">
                         <thead>
                             <tr
                                 class="border-b border-slate-100 bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                                <th class="py-3 px-4">Waktu Eksekusi</th>
-                                <th class="py-3 px-4">Endpoint Kemendikdasmen</th>
-                                <th class="py-3 px-4">Jenjang Target</th>
-                                <th class="py-3 px-4">Record Merged</th>
-                                <th class="py-3 px-4 text-right">HTTP Status</th>
+                                <th class="py-3 px-4 w-[22%] whitespace-nowrap">Waktu Eksekusi</th>
+                                <th class="py-3 px-4 w-[38%]">Endpoint Kemendikdasmen</th>
+                                <th class="py-3 px-4 w-[18%] whitespace-nowrap">Jenjang Target</th>
+                                <th class="py-3 px-4 w-[12%] text-center whitespace-nowrap">Record</th>
+                                <th class="py-3 px-4 w-[10%] text-right whitespace-nowrap">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 text-xs font-mono">
                             @foreach ($logs as $log)
                                 <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 text-slate-700">{{ $log['timestamp'] }}</td>
-                                    <td class="py-3 px-4 text-slate-900 font-semibold">{{ $log['endpoint'] }}</td>
-                                    <td class="py-3 px-4 text-slate-600">{{ $log['target'] }}</td>
-                                    <td class="py-3 px-4 font-bold text-slate-800">{{ $log['records'] }} Data</td>
-                                    <td class="py-3 px-4 text-right">
+                                    <td class="py-3.5 px-4 text-slate-700 whitespace-nowrap font-medium">
+                                        {{ $log['timestamp'] }}
+                                    </td>
+                                    <td class="py-3.5 px-4 text-slate-900 font-semibold wrap-break-words">
+                                        {{ $log['endpoint'] }}
+                                    </td>
+                                    <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">
+                                        {{ $log['target'] }}
+                                    </td>
+                                    <td class="py-3.5 px-4 font-bold text-slate-800 text-center whitespace-nowrap">
+                                        {{ $log['records'] }} Data
+                                    </td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                         <span
                                             class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             {{ $log['http_code'] }} {{ $log['status'] }}
