@@ -229,6 +229,62 @@ class C_MasterSekolah extends Controller
         ]);
     }
 
+    private function filterFields(array $item, array $fields): array
+{
+    if (empty($fields)) {
+        return $item; // Jika tidak ada filter, kembalikan utuh
+    }
+
+    $result = [];
+
+    // Pisahkan top-level keys dan nested keys (misal: "sekolah.luas_tanah_milik")
+    $topKeys = [];
+    $nestedMap = [];
+
+    foreach ($fields as $field) {
+        if (str_contains($field, '.')) {
+            [$parent, $child] = explode('.', $field, 2);
+            $nestedMap[$parent][] = $child;
+        } else {
+            $topKeys[] = $field;
+        }
+    }
+
+    // 1. Filter top-level keys
+    foreach ($topKeys as $key) {
+        if (array_key_exists($key, $item)) {
+            $result[$key] = $item[$key];
+        }
+    }
+
+    // 2. Filter nested-object keys (sekolah, ruang, ptk, rasio_siswa)
+    foreach ($nestedMap as $parent => $childKeys) {
+        if (isset($item[$parent])) {
+            $node = $item[$parent];
+            
+            // Tangani jika sub-object dalam bentuk array wrapper [0]
+            $isAssoc = true;
+            if (is_array($node) && array_is_list($node) && !empty($node)) {
+                $nodeData = $node[0];
+                $isAssoc = false;
+            } else {
+                $nodeData = $node;
+            }
+
+            $filteredSub = [];
+            foreach ($childKeys as $ck) {
+                if (is_array($nodeData) && array_key_exists($ck, $nodeData)) {
+                    $filteredSub[$ck] = $nodeData[$ck];
+                }
+            }
+
+            $result[$parent] = $isAssoc ? $filteredSub : [$filteredSub];
+        }
+    }
+
+    return $result;
+}
+
     public function getMapData()
     {
         $jsonPath = storage_path('json/sekolah.json');

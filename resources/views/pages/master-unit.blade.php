@@ -45,7 +45,8 @@
                 </div>
                 <div class="flex items-center gap-2 mt-1">
                     <p class="text-xl font-bold {{ $apiStatus === 'CONNECTED' ? 'text-slate-900' : 'text-rose-600' }}">
-                        {{ $apiStatus }}</p>
+                        {{ $apiStatus }}
+                    </p>
                     <span
                         class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold {{ $apiStatus === 'CONNECTED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                         HTTP {{ $httpCode }}
@@ -105,44 +106,232 @@
 
     <!-- Configuration & Execution Logs Grid -->
     <div class="grid grid-cols-12 gap-4">
-        <!-- Left: Parameter Target -->
+        <!-- Left Column: Parameter Target & Checkbox Selector Field JSON -->
         <div
-            class="col-span-12 lg:col-span-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            class="col-span-12 lg:col-span-5 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
-                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">Parameter Pipeline Target</h3>
-                <p class="text-[11px] text-slate-500 mb-4">Pengaturan gabungan 3 jenjang pendidikan.</p>
-                <div class="space-y-3 text-xs">
+                <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">Parameter Pipeline & Selector
+                    Field JSON</h3>
+                <p class="text-[11px] text-slate-500 mb-4">Centang properti data yang ingin ditarik dan disimpan ke <code
+                        class="font-mono text-emerald-600">sekolah.json</code>.</p>
+
+                <div class="space-y-3 text-xs mb-4">
                     <div>
                         <label class="font-semibold text-slate-700 block mb-1">Wilayah / Kabupaten</label>
                         <input type="text" value="Kota Palangka Raya" disabled
                             class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-600 font-medium">
                     </div>
-                    <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Jenjang Pendidikan Integrated</label>
-                        <input type="text" value="TK (1), SD (5), SMP (6)" disabled
-                            class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-bold">
-                    </div>
-                    <div>
-                        <label class="font-semibold text-slate-700 block mb-1">Target Storage File</label>
-                        <input type="text" value="sekolah.json" disabled
-                            class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg font-mono text-emerald-700 font-bold">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="font-semibold text-slate-700 block mb-1">Jenjang Integrated</label>
+                            <input type="text" value="TK, SD, SMP" disabled
+                                class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-bold">
+                        </div>
+                        <div>
+                            <label class="font-semibold text-slate-700 block mb-1">Target Storage File</label>
+                            <input type="text" value="sekolah.json" disabled
+                                class="w-full px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg font-mono text-emerald-700 font-bold">
+                        </div>
                     </div>
                 </div>
+
+                <!-- Control Button Quick Select Field -->
+                <div class="border-t border-slate-100 pt-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Properti Field
+                            Target</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="selectPreset('essential')"
+                                class="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded hover:bg-emerald-100">
+                                Preset Penting
+                            </button>
+                            <button type="button" onclick="selectAllFields(true)"
+                                class="px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 rounded hover:bg-slate-200">
+                                Semua
+                            </button>
+                            <button type="button" onclick="selectAllFields(false)"
+                                class="px-2 py-0.5 text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 rounded hover:bg-slate-200">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- List Checkbox Berdasarkan Sub Group Data JSON -->
+                    <form id="fieldSelectorForm" class="space-y-3 max-h-[clac(320px)] overflow-y-auto pr-1">
+                        <!-- Group 1: Identitas & Lokasi Dasar -->
+                        <div class="p-2.5 bg-slate-50/70 rounded-lg border border-slate-200/80">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase block mb-1.5">1. Identitas Utama &
+                                Lokasi</span>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah_id"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked disabled>
+                                    <span class="font-mono text-slate-800 font-medium">sekolah_id *</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="nama"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Nama Sekolah</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="npsn"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">NPSN</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="bentuk_pendidikan"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Jenjang/Bentuk</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="status_sekolah"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Status (Negeri/Swasta)</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="akreditasi"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Akreditasi</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="kecamatan"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Kecamatan</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="alamat_jalan"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Alamat Jalan</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Geospasial & GIS Coordinates -->
+                        <div class="p-2.5 bg-slate-50/70 rounded-lg border border-slate-200/80">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase block mb-1.5">2. Geospasial (GIS
+                                Map)</span>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="lintang"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Lintang (Latitude)</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="bujur"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Bujur (Longitude)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Group 3: Sub-Object Sekolah (KIB A & Utilitas) -->
+                        <div class="p-2.5 bg-slate-50/70 rounded-lg border border-slate-200/80">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase block mb-1.5">3. Sub-Object
+                                `sekolah` (Tanah & Utilitas)</span>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.luas_tanah_milik"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Luas Tanah Milik</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.luas_tanah_bukan_milik"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Luas Bukan Milik</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.daya_listrik"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Daya Listrik</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.akses_internet"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Akses Internet</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.email"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Email Sekolah</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="sekolah.nomor_telepon"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Nomor Telepon</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Group 4: Sub-Object Ruang, PTK, Rasio -->
+                        <div class="p-2.5 bg-slate-50/70 rounded-lg border border-slate-200/80">
+                            <span class="text-[10px] font-bold text-slate-500 uppercase block mb-1.5">4. Sub-Object
+                                Fasilitas, PTK & Siswa</span>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="ruang.ruang_kelas_baik"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Ruang Kelas Baik</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="ruang.ruang_perpustakaan_baik"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Perpustakaan Baik</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="ptk.ptk_guru_l"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">PTK Guru L</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="ptk.ptk_guru_p"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">PTK Guru P</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="field" value="rasio_siswa.jml_pd"
+                                        class="field-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked>
+                                    <span class="text-slate-700">Jumlah Siswa (PD)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="pt-4 border-t border-slate-100 mt-6">
-                <span class="text-[10px] text-slate-400">Data hasil gabungan siap disajikan pada Halaman Aset Sekolah &
-                    Snapshot DB.</span>
+            <div class="pt-3 border-t border-slate-100 mt-2">
+                <span class="text-[10px] text-slate-400 block">Hanya properti yang dicentang di atas yang akan diproses dan
+                    disimpan saat sync streaming dijalankan.</span>
             </div>
         </div>
 
-        <!-- Right: Tabel Log Riwayat Pipeline Ingestion (KEMBALI UTUH) -->
+        <!-- Right Column: Tabel Log Riwayat Pipeline Ingestion -->
         <div
-            class="col-span-12 lg:col-span-8 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between">
+            class="col-span-12 lg:col-span-7 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between">
             <div>
                 <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div>
-                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Log Riwayat Pipeline Ingestion
-                        </h3>
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Log Riwayat Pipeline
+                            Ingestion</h3>
                         <p class="text-[11px] text-slate-500">Audit trail fetching data Kemendikdasmen ke JSON lokal</p>
                     </div>
                     <span class="text-[11px] font-mono text-slate-400">Log Live: ACTIVE</span>
@@ -195,7 +384,6 @@
                 </div>
                 <span id="syncCounter" class="text-xs font-mono font-bold text-slate-600">0 / 0</span>
             </div>
-
             <!-- Progress Bar -->
             <div>
                 <div class="flex justify-between text-xs mb-1 font-medium">
@@ -208,13 +396,11 @@
                         style="width: 0%"></div>
                 </div>
             </div>
-
             <!-- Console Log Output Box -->
             <div id="syncLogConsole"
                 class="bg-slate-900 rounded-lg p-3 text-[11px] font-mono text-emerald-400 h-36 overflow-y-auto space-y-1">
                 <div>> [SYSTEM] Initializing SSE Pipeline Connection...</div>
             </div>
-
             <div class="flex justify-end pt-2">
                 <button id="closeSyncBtn" disabled onclick="location.reload()"
                     class="px-4 py-1.5 text-xs font-semibold bg-slate-200 text-slate-400 rounded-lg transition-colors cursor-not-allowed">
@@ -227,8 +413,40 @@
 
 @push('scripts')
     <script>
+        function selectAllFields(status) {
+            document.querySelectorAll('.field-checkbox').forEach(cb => {
+                if (!cb.disabled) cb.checked = status;
+            });
+        }
+
+        function selectPreset(type) {
+            const essentialFields = [
+                'nama', 'npsn', 'bentuk_pendidikan', 'status_sekolah', 'akreditasi', 'kecamatan', 'alamat_jalan',
+                'lintang', 'bujur', 'sekolah.luas_tanah_milik', 'sekolah.daya_listrik',
+                'ruang.ruang_kelas_baik', 'ruang.ruang_perpustakaan_baik', 'ptk.ptk_guru_l', 'ptk.ptk_guru_p',
+                'rasio_siswa.jml_pd'
+            ];
+
+            document.querySelectorAll('.field-checkbox').forEach(cb => {
+                if (!cb.disabled) {
+                    cb.checked = essentialFields.includes(cb.value);
+                }
+            });
+        }
+
         function startRealtimeSync() {
-            if (!confirm('Jalankan real-time SSE sync pipeline ke sekolah.json?')) return;
+            // Highlighting field tercentang
+            const selectedFields = ['sekolah_id']; // sekolah_id mandatory primary key
+            document.querySelectorAll('.field-checkbox:checked').forEach(cb => {
+                if (cb.value !== 'sekolah_id') selectedFields.push(cb.value);
+            });
+
+            if (selectedFields.length === 1) {
+                alert('Pilih setidaknya satu properti selain sekolah_id untuk ditarik!');
+                return;
+            }
+
+            if (!confirm(`Jalankan sync pipeline dengan ${selectedFields.length} field properti pilihan antum?`)) return;
 
             const modal = document.getElementById('syncProgressModal');
             const progressBar = document.getElementById('syncProgressBar');
@@ -241,18 +459,17 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            // SSE Client Connection ke Route Laravel Stream
-            const evtSource = new EventSource("{{ route('admin.master-unit.sync-stream') }}");
+            // SSE Client Connection dengan Query Param Fields Terpilih
+            const fieldsParam = encodeURIComponent(selectedFields.join(','));
+            const evtSource = new EventSource(`{{ route('admin.master-unit.sync-stream') }}?fields=${fieldsParam}`);
 
             evtSource.onmessage = function(e) {
                 const data = JSON.parse(e.data);
-
                 if (data.error) {
                     consoleLog.innerHTML += `<div class="text-rose-400">> [ERROR] ${data.error}</div>`;
                     evtSource.close();
                     return;
                 }
-
                 if (data.complete) {
                     progressBar.style.width = '100%';
                     percentText.textContent = '100%';
@@ -260,7 +477,6 @@
                     consoleLog.innerHTML +=
                         `<div class="text-emerald-300 font-bold">> [SUCCESS] Ingestion Selesai & File sekolah.json Diperbarui!</div>`;
                     consoleLog.scrollTop = consoleLog.scrollHeight;
-
                     closeBtn.disabled = false;
                     closeBtn.classList.remove('bg-slate-200', 'text-slate-400', 'cursor-not-allowed');
                     closeBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'text-white');
@@ -268,14 +484,12 @@
                     evtSource.close();
                     return;
                 }
-
-                // Update UI Counters & Bar
+                // Update UI Counters & Bar                 
                 progressBar.style.width = data.percentage + '%';
                 percentText.textContent = data.percentage + '%';
                 counterText.textContent = `${data.current} / ${data.total}`;
                 statusText.textContent = `Fetching: ${data.nama}`;
-
-                // Append Log Console Modal
+                // Append Log Console Modal                 
                 consoleLog.innerHTML +=
                     `<div>> [INGEST] (${data.current}/${data.total}) [${data.npsn}] ${data.nama}</div>`;
                 consoleLog.scrollTop = consoleLog.scrollHeight;
