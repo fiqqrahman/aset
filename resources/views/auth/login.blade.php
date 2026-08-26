@@ -18,6 +18,9 @@
 
 <body class="h-full text-slate-800 antialiased selection:bg-slate-200">
 
+    <!-- Inject Toast Floating Container -->
+    @include('components.toast')
+
     <div class="min-h-screen flex">
 
         <!-- SISI KIRI (FORM PANEL - 3/12 SCREEN FULL CONTAINER) -->
@@ -31,26 +34,7 @@
                     <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Masukkan NIP / Email dinas dan kata sandi
                         Antum untuk masuk ke sistem.</p>
                 </div>
-
-                <!-- Session Flash Messages -->
-                @if (session('status'))
-                    <div
-                        class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 font-medium">
-                        {{ session('status') }}
-                    </div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-700 space-y-1">
-                        <p class="font-bold">Gagal Autentikasi:</p>
-                        <ul class="list-disc list-inside space-y-0.5 text-xs">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
+              
                 <!-- Login Form (Full Width to Container) -->
                 <form method="POST" action="{{ route('login') }}" class="space-y-4 w-full">
                     @csrf
