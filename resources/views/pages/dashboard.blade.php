@@ -180,7 +180,8 @@
                     <div>
                         <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Aktivitas & Log Rekonsiliasi
                             Aset Terbaru</h3>
-                        <p class="text-[11px] text-slate-500">Pembaruan kondisi fisik dan mutasi barang oleh pengurus barang
+                        <p class="text-[11px] text-slate-500">Pembaruan kondisi fisik dan mutasi barang oleh pengurus
+                            barang
                             sekolah</p>
                     </div>
                     <button
@@ -301,8 +302,10 @@
         <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[calc(600px)]">
             <div class="flex items-center justify-between mb-3">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah</h3>
-                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka Raya</p>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
+                    </h3>
+                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka
+                        Raya</p>
                 </div>
                 <div class="flex items-center gap-3 text-[10px] text-slate-500">
                     <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
@@ -319,31 +322,36 @@
 
             <!-- Wrapper Container Peta & Floating Search Overlay -->
             <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
-                
+
                 <!-- Floating Map Search Box Control -->
                 <div class="absolute top-3 left-3 z-[calc(1000)] w-72 sm:w-80">
                     <div class="relative">
                         <input type="text" id="mapSearchInput" placeholder="Cari nama sekolah / NPSN di peta..."
                             class="w-full pl-8 pr-8 py-2 text-xs bg-white/95 backdrop-blur-md border border-slate-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-medium text-slate-800 placeholder:text-slate-400">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <button id="clearMapSearch" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+                        <button id="clearMapSearch"
+                            class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
                     <!-- Autocomplete Dropdown List -->
-                    <div id="mapSearchResults" class="hidden mt-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs">
+                    <div id="mapSearchResults"
+                        class="hidden mt-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs">
                     </div>
                 </div>
 
                 <!-- Leaflet Container -->
                 <div id="map"></div>
             </div>
-        </div>    
+        </div>
     </div>
 @endsection
 
@@ -354,10 +362,10 @@
             // 1. Leaflet GIS Map Init
             const map = L.map('map', {
                 zoomControl: false, // Matikan zoom control bawaan di top-left
-                scrollWheelZoom: true // AKTIFKAN ZOOM GULIR MOUSE
+                scrollWheelZoom: true // Aktifkan zoom gulir mouse
             }).setView([-2.2096, 113.9145], 12);
 
-            // Pindahkan Tombol Zoom (+) dan (-) ke Pojok Kanan Bawah agar tidak menutupi Search Input
+            // Pindahkan Tombol Zoom (+) dan (-) ke Pojok Kanan Bawah
             L.control.zoom({
                 position: 'bottomright'
             }).addTo(map);
@@ -436,20 +444,46 @@
                     if (!data || !Array.isArray(data)) return;
 
                     data.forEach(item => {
-                        const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ? item.sekolah[0] : (item.sekolah || {});
-                        const ruangNode = (Array.isArray(item.ruang) && item.ruang.length > 0) ? item.ruang[0] : (item.ruang || {});
-                        const ptkNode = (Array.isArray(item.ptk) && item.ptk.length > 0) ? item.ptk[0] : (item.ptk || {});
-                        const rasioNode = (Array.isArray(item.rasio_siswa) && item.rasio_siswa.length > 0) ? item.rasio_siswa[0] : (item.rasio_siswa || {});
-                        
-                        const lat = parseFloat(item.lintang || sekolahNode.lintang || 0);
-                        const lng = parseFloat(item.bujur || sekolahNode.bujur || 0);
+                        const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ?
+                            item.sekolah[0] : (item.sekolah || {});
+                        const ruangNode = (Array.isArray(item.ruang) && item.ruang.length > 0) ?
+                            item.ruang[0] : (item.ruang || {});
+                        const ptkNode = (Array.isArray(item.ptk) && item.ptk.length > 0) ?
+                            item.ptk[0] : (item.ptk || {});
+                        const rasioNode = (Array.isArray(item.rasio_siswa) && item.rasio_siswa.length >
+                                0) ?
+                            item.rasio_siswa[0] : (item.rasio_siswa || {});
 
-                        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                        let lat = parseFloat(item.lintang || sekolahNode.lintang || 0);
+                        let lng = parseFloat(item.bujur || sekolahNode.bujur || 0);
+
+                        // --- SANITASI & CORRECTION KOORDINAT GEOSPASIAL ---
+                        // 1. Auto-Fix jika tanda minus (-) pada Lintang Selatan tertinggal
+                        if (lat > 0 && lat < 10) {
+                            lat = -lat;
+                        }
+
+                        // 2. Auto-Fix jika koordinat terbalik (Swapped Lat/Lng)
+                        if (lat < -90 || lat > 90 || lng < -180 || lng > 180 || (lat < -100 && lng > -
+                                10)) {
+                            const temp = lat;
+                            lat = lng;
+                            lng = temp;
+                        }
+
+                        // 3. Geofencing Bounding Box Khusus Kota Palangka Raya & Sekitarnya
+                        const isValidPalangkaBounds = (lat >= -2.8 && lat <= -1.3) && (lng >= 113.3 &&
+                            lng <= 114.3);
+
+                        // Plot hanya koordinat yang valid dan masuk Bounding Box Palangka Raya
+                        if (!isNaN(lat) && !isNaN(lng) && isValidPalangkaBounds) {
                             const bentuk = (item.bentuk_pendidikan || '').toUpperCase();
                             const customIcon = createCustomIcon(bentuk);
                             if (!customIcon) return;
 
-                            const marker = L.marker([lat, lng], { icon: customIcon });
+                            const marker = L.marker([lat, lng], {
+                                icon: customIcon
+                            });
 
                             const popupContent = `
                                 <div style="font-family: 'Inter', sans-serif; width: 280px; max-height: 350px; overflow-y: auto; padding: 2px;">
@@ -490,7 +524,9 @@
                                     </div>
                                 </div>
                             `;
-                            marker.bindPopup(popupContent, { maxWidth: 300 });
+                            marker.bindPopup(popupContent, {
+                                maxWidth: 300
+                            });
 
                             // Plot ke Layer Group
                             if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
@@ -523,7 +559,10 @@
                         "<span style='font-size:11px; font-weight:600;'>Jenjang SD</span>": layerSD,
                         "<span style='font-size:11px; font-weight:600;'>Jenjang SMP</span>": layerSMP
                     };
-                    L.control.layers(null, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);
+                    L.control.layers(null, overlayMaps, {
+                        collapsed: false,
+                        position: 'topright'
+                    }).addTo(map);
                 })
                 .catch(err => console.error("DETAIL ERROR MAP:", err.message));
 
@@ -532,131 +571,151 @@
             const searchResults = document.getElementById('mapSearchResults');
             const clearBtn = document.getElementById('clearMapSearch');
 
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
+            if (searchInput && searchResults && clearBtn) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
 
-                if (query.length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
+                    if (query.length > 0) {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                        searchResults.classList.add('hidden');
+                        searchResults.innerHTML = '';
+                        return;
+                    }
+
+                    const filtered = searchIndexData.filter(item =>
+                        item.nama.toLowerCase().includes(query) ||
+                        item.npsn.toLowerCase().includes(query)
+                    ).slice(0, 8);
+
+                    if (filtered.length > 0) {
+                        searchResults.innerHTML = filtered.map((item, index) => `
+                            <div data-index="${index}" class="search-item p-2.5 hover:bg-slate-100/80 cursor-pointer transition-colors flex items-center justify-between">
+                                <div>
+                                    <div class="font-bold text-slate-800">${item.nama}</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">NPSN: ${item.npsn}</div>
+                                </div>
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-slate-800 text-white">${item.bentuk}</span>
+                            </div>
+                        `).join('');
+
+                        searchResults.classList.remove('hidden');
+
+                        searchResults.querySelectorAll('.search-item').forEach(el => {
+                            el.addEventListener('click', function() {
+                                const idx = parseInt(this.getAttribute('data-index'));
+                                const target = filtered[idx];
+
+                                if (target) {
+                                    map.flyTo([target.lat, target.lng], 16, {
+                                        animate: true,
+                                        duration: 1.5
+                                    });
+
+                                    setTimeout(() => {
+                                        target.marker.openPopup();
+                                    }, 1200);
+
+                                    searchResults.classList.add('hidden');
+                                    searchInput.value = target.nama;
+                                }
+                            });
+                        });
+                    } else {
+                        searchResults.innerHTML = `
+                            <div class="p-3 text-center text-slate-400 font-medium">
+                                Sekolah tidak ditemukan.
+                            </div>
+                        `;
+                        searchResults.classList.remove('hidden');
+                    }
+                });
+
+                clearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
                     searchResults.classList.add('hidden');
                     searchResults.innerHTML = '';
-                    return;
-                }
+                    this.classList.add('hidden');
+                });
 
-                const filtered = searchIndexData.filter(item => 
-                    item.nama.toLowerCase().includes(query) || 
-                    item.npsn.toLowerCase().includes(query)
-                ).slice(0, 8);
-
-                if (filtered.length > 0) {
-                    searchResults.innerHTML = filtered.map((item, index) => `
-                        <div data-index="${index}" class="search-item p-2.5 hover:bg-slate-100/80 cursor-pointer transition-colors flex items-center justify-between">
-                            <div>
-                                <div class="font-bold text-slate-800">${item.nama}</div>
-                                <div class="text-[10px] text-slate-500 font-mono">NPSN: ${item.npsn}</div>
-                            </div>
-                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-slate-800 text-white">${item.bentuk}</span>
-                        </div>
-                    `).join('');
-
-                    searchResults.classList.remove('hidden');
-
-                    document.querySelectorAll('.search-item').forEach((el, idx) => {
-                        el.addEventListener('click', function() {
-                            const target = filtered[idx];
-                            
-                            map.flyTo([target.lat, target.lng], 16, {
-                                animate: true,
-                                duration: 1.5
-                            });
-
-                            setTimeout(() => {
-                                target.marker.openPopup();
-                            }, 1200);
-
-                            searchResults.classList.add('hidden');
-                            searchInput.value = target.nama;
-                        });
-                    });
-                } else {
-                    searchResults.innerHTML = `
-                        <div class="p-3 text-center text-slate-400 font-medium">
-                            Sekolah tidak ditemukan.
-                        </div>
-                    `;
-                    searchResults.classList.remove('hidden');
-                }
-            });
-
-            clearBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                searchResults.classList.add('hidden');
-                searchResults.innerHTML = '';
-                this.classList.add('hidden');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.classList.add('hidden');
-                }
-            });
+                document.addEventListener('click', function(e) {
+                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.classList.add('hidden');
+                    }
+                });
+            }
 
             // 3. Chart.js Asset Growth Init
-            const ctx = document.getElementById('assetGrowthChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2022', '2023', '2024', '2025', '2026'],
-                    datasets: [{
-                            label: 'Nilai Perolehan (Miliar)',
-                            data: [110.2, 122.5, 131.0, 139.4, 142.85],
-                            borderColor: '#1e293b',
-                            backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.35,
-                            pointRadius: 3
-                        },
-                        {
-                            label: 'Penyusutan (Miliar)',
-                            data: [12.1, 14.8, 18.2, 21.5, 24.1],
-                            borderColor: '#f43f5e',
-                            borderDash: [4, 4],
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.35,
-                            pointRadius: 3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+            const chartEl = document.getElementById('assetGrowthChart');
+            if (chartEl) {
+                const ctx = chartEl.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2022', '2023', '2024', '2025', '2026'],
+                        datasets: [{
+                                label: 'Nilai Perolehan (Miliar)',
+                                data: [110.2, 122.5, 131.0, 139.4, 142.85],
+                                borderColor: '#1e293b',
+                                backgroundColor: 'rgba(30, 41, 59, 0.05)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 3
+                            },
+                            {
+                                label: 'Penyusutan (Miliar)',
+                                data: [12.1, 14.8, 18.2, 21.5, 24.1],
+                                borderColor: '#f43f5e',
+                                borderDash: [4, 4],
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.35,
+                                pointRadius: 3
+                            }
+                        ]
                     },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                font: { size: 10, family: 'Inter' },
-                                color: '#64748b'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                font: { size: 10, family: 'Inter' },
-                                color: '#64748b',
-                                callback: function(value) {
-                                    return 'Rp ' + value + 'M';
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 10,
+                                        family: 'Inter'
+                                    },
+                                    color: '#64748b'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: '#f1f5f9'
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 10,
+                                        family: 'Inter'
+                                    },
+                                    color: '#64748b',
+                                    callback: function(value) {
+                                        return 'Rp ' + value + 'M';
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
 @endpush

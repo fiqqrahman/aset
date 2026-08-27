@@ -1,7 +1,7 @@
 {
     "status": "success",
     "total": 332,
-    "updated_at": "2026-08-27 15:10:07",
+    "updated_at": "2026-08-27 15:24:08",
     "data": [
         {
             "sekolah_id": "127C8DB1-3AC9-484E-A0CF-0BAE14E69BF5",
@@ -2239,15 +2239,17 @@
             "akreditasi": "A",
             "kecamatan": "Kec. Jekan Raya",
             "alamat_jalan": "JL. Rajawali VII",
-            "lintang": -1.9572,
-            "bujur": 113.8601,
+            "lintang": -2.1891196142462954,
+            "bujur": 113.88797397125819,
             "sekolah": {
                 "luas_tanah_milik": 1637,
                 "luas_tanah_bukan_milik": 0,
                 "daya_listrik": 22000,
                 "akses_internet": "Fibre Optic",
                 "email": "smpitalghazali@gmail.com",
-                "nomor_telepon": "05363244446"
+                "nomor_telepon": "05363244446",
+                "lintang": -2.1891196142462954,
+                "bujur": 113.88797397125819
             },
             "ruang": {
                 "ruang_kelas_baik": 7,
@@ -2259,7 +2261,9 @@
             },
             "rasio_siswa": {
                 "jml_pd": 113
-            }
+            },
+            "is_manual_override": true,
+            "manual_updated_at": "2026-08-27 15:24:08"
         },
         {
             "sekolah_id": "B057029B-D227-E211-B835-FD135C92DECB",
