@@ -297,14 +297,12 @@
             </div>
         </div>
 
-        <!-- Bento Row 2: GIS Map Container -->
+        <!-- Bento Row 2: GIS Map Container dengan Search Overlay -->
         <div class="col-span-12 bg-white p-4 rounded-xl border border-slate-200 flex flex-col h-[calc(600px)]">
             <div class="flex items-center justify-between mb-3">
                 <div>
-                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah
-                    </h3>
-                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka
-                        Raya</p>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Sebaran Geospasial Aset Sekolah</h3>
+                    <p class="text-[11px] text-slate-500">Kepadatan dan distribusi aset pada sekolah di wilayah Palangka Raya</p>
                 </div>
                 <div class="flex items-center gap-3 text-[10px] text-slate-500">
                     <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
@@ -318,23 +316,51 @@
                     </span>
                 </div>
             </div>
+
+            <!-- Wrapper Container Peta & Floating Search Overlay -->
             <div class="flex-1 w-full rounded-lg overflow-hidden border border-slate-100 bg-slate-50 relative">
+                
+                <!-- Floating Map Search Box Control -->
+                <div class="absolute top-3 left-3 z-[calc(1000)] w-72 sm:w-80">
+                    <div class="relative">
+                        <input type="text" id="mapSearchInput" placeholder="Cari nama sekolah / NPSN di peta..."
+                            class="w-full pl-8 pr-8 py-2 text-xs bg-white/95 backdrop-blur-md border border-slate-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-medium text-slate-800 placeholder:text-slate-400">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <button id="clearMapSearch" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Autocomplete Dropdown List -->
+                    <div id="mapSearchResults" class="hidden mt-1.5 bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs">
+                    </div>
+                </div>
+
+                <!-- Leaflet Container -->
                 <div id="map"></div>
             </div>
-        </div>     
+        </div>    
     </div>
 @endsection
 
 @push('scripts')
-    <!-- Inject Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // 1. Leaflet GIS Map Init
             const map = L.map('map', {
-                zoomControl: true,
-                scrollWheelZoom: false
+                zoomControl: false, // Matikan zoom control bawaan di top-left
+                scrollWheelZoom: true // AKTIFKAN ZOOM GULIR MOUSE
             }).setView([-2.2096, 113.9145], 12);
+
+            // Pindahkan Tombol Zoom (+) dan (-) ke Pojok Kanan Bawah agar tidak menutupi Search Input
+            L.control.zoom({
+                position: 'bottomright'
+            }).addTo(map);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
@@ -346,25 +372,24 @@
             const layerSD = L.layerGroup();
             const layerSMP = L.layerGroup();
 
-            // Helper Custom Marker Icon Berdasarkan Warna Filosofi Seragam
+            // Array simpan indeks sekolah untuk live search
+            let searchIndexData = [];
+
             function createCustomIcon(bentuk) {
                 let badgeBg = '';
                 let labelText = '';
-
                 if (['TK', 'PAUD', 'KB', 'SPS', 'TPA'].includes(bentuk)) {
-                    badgeBg = '#16a34a'; // Hijau (Hijau Alam / Mengenal Dunia)
+                    badgeBg = '#16a34a';
                     labelText = 'TK';
                 } else if (bentuk === 'SD') {
-                    badgeBg = '#dc2626'; // Merah (Seragam SD Merah Putih)
+                    badgeBg = '#dc2626';
                     labelText = 'SD';
                 } else if (bentuk === 'SMP') {
-                    badgeBg = '#1e3a8a'; // Biru Gelap / Navy (Seragam SMP Biru Putih)
+                    badgeBg = '#1e3a8a';
                     labelText = 'SMP';
                 } else {
-                    // Abaikan unit di luar TK, SD, dan SMP
                     return null;
                 }
-
                 return L.divIcon({
                     className: 'custom-map-pin',
                     html: `
@@ -408,37 +433,26 @@
                     return data;
                 })
                 .then(data => {
-                    if (!data || !Array.isArray(data)) {
-                        console.error("Payload yang diterima bukan Array Sekolah:", data);
-                        return;
-                    }
+                    if (!data || !Array.isArray(data)) return;
 
                     data.forEach(item => {
-                        const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ?
-                            item.sekolah[0] : (item.sekolah || {});
-                        const ruangNode = (Array.isArray(item.ruang) && item.ruang.length > 0) ?
-                            item.ruang[0] : (item.ruang || {});
-                        const ptkNode = (Array.isArray(item.ptk) && item.ptk.length > 0) ?
-                            item.ptk[0] : (item.ptk || {});
-                        const rasioNode = (Array.isArray(item.rasio_siswa) && item.rasio_siswa.length > 0) ?
-                            item.rasio_siswa[0] : (item.rasio_siswa || {});
-
+                        const sekolahNode = (Array.isArray(item.sekolah) && item.sekolah.length > 0) ? item.sekolah[0] : (item.sekolah || {});
+                        const ruangNode = (Array.isArray(item.ruang) && item.ruang.length > 0) ? item.ruang[0] : (item.ruang || {});
+                        const ptkNode = (Array.isArray(item.ptk) && item.ptk.length > 0) ? item.ptk[0] : (item.ptk || {});
+                        const rasioNode = (Array.isArray(item.rasio_siswa) && item.rasio_siswa.length > 0) ? item.rasio_siswa[0] : (item.rasio_siswa || {});
+                        
                         const lat = parseFloat(item.lintang || sekolahNode.lintang || 0);
                         const lng = parseFloat(item.bujur || sekolahNode.bujur || 0);
 
                         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
                             const bentuk = (item.bentuk_pendidikan || '').toUpperCase();
                             const customIcon = createCustomIcon(bentuk);
-
-                            // Jika di luar TK, SD, SMP, langsung bypass
                             if (!customIcon) return;
 
                             const marker = L.marker([lat, lng], { icon: customIcon });
 
-                            // Popup Content Tree View
                             const popupContent = `
                                 <div style="font-family: 'Inter', sans-serif; width: 280px; max-height: 350px; overflow-y: auto; padding: 2px;">
-                                    <!-- Header Info Unit -->
                                     <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 8px;">
                                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                                             <span style="font-size: 9px; font-weight: 800; background: #0f172a; color: #fff; padding: 1px 6px; border-radius: 4px;">${bentuk}</span>
@@ -447,8 +461,6 @@
                                         <h4 style="font-size: 12px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.3;">${item.nama || '-'}</h4>
                                         <p style="font-size: 10px; color: #64748b; font-family: monospace; margin: 2px 0 0 0;">NPSN: ${item.npsn || '-'}</p>
                                     </div>
-
-                                    <!-- Quick Summary Metrics -->
                                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 10px; background: #f8fafc; padding: 6px; border-radius: 6px; border: 1px solid #f1f5f9;">
                                         <div style="text-align: center;">
                                             <span style="font-size: 9px; color: #64748b; display: block;">Siswa</span>
@@ -463,37 +475,14 @@
                                             <strong style="font-size: 11px; color: #2563eb;">${(parseInt(ptkNode.ptk_guru_l || 0) + parseInt(ptkNode.ptk_guru_p || 0))}</strong>
                                         </div>
                                     </div>
-
-                                    <!-- Tree View Hierarchy Asset Breakdown -->
                                     <div style="font-size: 11px; color: #334155;">
                                         <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; letter-spacing: 0.5px;">Struktur Aset Unit (Tree View)</div>
                                         <ul style="list-style: none; padding-left: 0; margin: 0;">
                                             <li style="margin-bottom: 4px;">
                                                 <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
-                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 KIB A - Tanah & Lahan</summary>
+                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">KIB A - Tanah & Lahan</summary>
                                                     <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
-                                                        <div>• Luas Lahan Milik: <strong>${sekolahNode.luas_tanah_milik ?? 0} m²</strong></div>
-                                                        <div>• Luas Lahan Bukan Milik: <strong>${sekolahNode.luas_tanah_bukan_milik ?? 0} m²</strong></div>
-                                                    </div>
-                                                </details>
-                                            </li>
-                                            <li style="margin-bottom: 4px;">
-                                                <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
-                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 KIB C - Gedung & Ruangan</summary>
-                                                    <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
-                                                        <div>• Ruang Kelas Baik: <strong>${ruangNode.ruang_kelas_baik ?? 0} unit</strong></div>
-                                                        <div>• Ruang Perpus Baik: <strong>${ruangNode.ruang_perpustakaan_baik ?? 0} unit</strong></div>
-                                                        <div>• R. Lab IPA / Komputer: <strong>${(ruangNode.ruang_lab_baik ?? 0)} unit</strong></div>
-                                                    </div>
-                                                </details>
-                                            </li>
-                                            <li style="margin-bottom: 4px;">
-                                                <details style="border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; background: #fff;">
-                                                    <summary style="font-weight: 600; cursor: pointer; color: #0f172a; outline: none;">📁 Utilitas & Sarpras</summary>
-                                                    <div style="padding-top: 4px; padding-left: 12px; font-size: 10px; color: #475569; border-top: 1px dashed #e2e8f0; margin-top: 4px;">
-                                                        <div>• Pasokan Listrik: <strong>${sekolahNode.daya_listrik ?? 0} Watt</strong></div>
-                                                        <div>• Akses Internet: <strong>${sekolahNode.akses_internet ?? '-'}</strong></div>
-                                                        <div>• Alamat: <i>${item.alamat_jalan || '-'}, ${item.kecamatan || '-'}</i></div>
+                                                        <div>Luas Lahan Milik: <strong>${sekolahNode.luas_tanah_milik ?? 0} m²</strong></div>
                                                     </div>
                                                 </details>
                                             </li>
@@ -501,7 +490,6 @@
                                     </div>
                                 </div>
                             `;
-
                             marker.bindPopup(popupContent, { maxWidth: 300 });
 
                             // Plot ke Layer Group
@@ -512,6 +500,16 @@
                             } else if (bentuk === 'SD') {
                                 marker.addTo(layerSD);
                             }
+
+                            // Simpan ke Search Index Array
+                            searchIndexData.push({
+                                nama: item.nama || '',
+                                npsn: item.npsn || '',
+                                bentuk: bentuk,
+                                lat: lat,
+                                lng: lng,
+                                marker: marker
+                            });
                         }
                     });
 
@@ -525,12 +523,86 @@
                         "<span style='font-size:11px; font-weight:600;'>Jenjang SD</span>": layerSD,
                         "<span style='font-size:11px; font-weight:600;'>Jenjang SMP</span>": layerSMP
                     };
-
-                    L.control.layers(null, overlayMaps, { collapsed: false }).addTo(map);
+                    L.control.layers(null, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);
                 })
                 .catch(err => console.error("DETAIL ERROR MAP:", err.message));
 
-            // 2. Chart.js Asset Growth Init
+            // 2. Map Autocomplete Search Interaction
+            const searchInput = document.getElementById('mapSearchInput');
+            const searchResults = document.getElementById('mapSearchResults');
+            const clearBtn = document.getElementById('clearMapSearch');
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+
+                if (query.length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                    searchResults.classList.add('hidden');
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                const filtered = searchIndexData.filter(item => 
+                    item.nama.toLowerCase().includes(query) || 
+                    item.npsn.toLowerCase().includes(query)
+                ).slice(0, 8);
+
+                if (filtered.length > 0) {
+                    searchResults.innerHTML = filtered.map((item, index) => `
+                        <div data-index="${index}" class="search-item p-2.5 hover:bg-slate-100/80 cursor-pointer transition-colors flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-slate-800">${item.nama}</div>
+                                <div class="text-[10px] text-slate-500 font-mono">NPSN: ${item.npsn}</div>
+                            </div>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-slate-800 text-white">${item.bentuk}</span>
+                        </div>
+                    `).join('');
+
+                    searchResults.classList.remove('hidden');
+
+                    document.querySelectorAll('.search-item').forEach((el, idx) => {
+                        el.addEventListener('click', function() {
+                            const target = filtered[idx];
+                            
+                            map.flyTo([target.lat, target.lng], 16, {
+                                animate: true,
+                                duration: 1.5
+                            });
+
+                            setTimeout(() => {
+                                target.marker.openPopup();
+                            }, 1200);
+
+                            searchResults.classList.add('hidden');
+                            searchInput.value = target.nama;
+                        });
+                    });
+                } else {
+                    searchResults.innerHTML = `
+                        <div class="p-3 text-center text-slate-400 font-medium">
+                            Sekolah tidak ditemukan.
+                        </div>
+                    `;
+                    searchResults.classList.remove('hidden');
+                }
+            });
+
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchResults.classList.add('hidden');
+                searchResults.innerHTML = '';
+                this.classList.add('hidden');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+
+            // 3. Chart.js Asset Growth Init
             const ctx = document.getElementById('assetGrowthChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
