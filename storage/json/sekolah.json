@@ -1,7 +1,7 @@
 {
     "status": "success",
     "total": 332,
-    "updated_at": "2026-08-27 15:24:08",
+    "updated_at": "2026-08-27 15:51:10",
     "data": [
         {
             "sekolah_id": "127C8DB1-3AC9-484E-A0CF-0BAE14E69BF5",
@@ -2053,15 +2053,17 @@
             "akreditasi": "A",
             "kecamatan": "Kec. Jekan Raya",
             "alamat_jalan": "Jln. Garuda IV no 51",
-            "lintang": -2.1918928,
-            "bujur": 113.8152146,
+            "lintang": -2.19583565359359,
+            "bujur": 113.89225448834188,
             "sekolah": {
                 "luas_tanah_milik": 360000,
                 "luas_tanah_bukan_milik": 0,
                 "daya_listrik": 5500,
                 "akses_internet": "Fibre Optic",
                 "email": "sdit2alghazali@gmail.com",
-                "nomor_telepon": "05363247986"
+                "nomor_telepon": "05363247986",
+                "lintang": -2.19583565359359,
+                "bujur": 113.89225448834188
             },
             "ruang": {
                 "ruang_kelas_baik": 12,
@@ -2073,7 +2075,9 @@
             },
             "rasio_siswa": {
                 "jml_pd": 247
-            }
+            },
+            "is_manual_override": true,
+            "manual_updated_at": "2026-08-27 15:51:10"
         },
         {
             "sekolah_id": "04E2D417-DF38-4280-B8EF-60EF7A06DEE8",
@@ -8604,15 +8608,17 @@
             "akreditasi": "B",
             "kecamatan": "Kec. Jekan Raya",
             "alamat_jalan": "JL. TJILIK RIWUT KM. 6",
-            "lintang": -2.172766,
-            "bujur": 113.875705,
+            "lintang": -2.170637871481669,
+            "bujur": 113.87468218134694,
             "sekolah": {
                 "luas_tanah_milik": 913500,
                 "luas_tanah_bukan_milik": 0,
                 "daya_listrik": 1000,
                 "akses_internet": "Seluler",
                 "email": "tkkartikav64pky@gmail.com",
-                "nomor_telepon": "085752100200"
+                "nomor_telepon": "085752100200",
+                "lintang": -2.170637871481669,
+                "bujur": 113.87468218134694
             },
             "ruang": {
                 "ruang_kelas_baik": 2,
@@ -8624,7 +8630,9 @@
             },
             "rasio_siswa": {
                 "jml_pd": 28
-            }
+            },
+            "is_manual_override": true,
+            "manual_updated_at": "2026-08-27 15:45:45"
         },
         {
             "sekolah_id": "020DD635-4EB2-4987-86BE-8DD54FAE641C",
@@ -9808,15 +9816,17 @@
             "akreditasi": "C",
             "kecamatan": "Kec. Jekan Raya",
             "alamat_jalan": "JL. G. OBOS X",
-            "lintang": -2.1284282,
-            "bujur": 113.8990607,
+            "lintang": -2.2437046908495066,
+            "bujur": 113.89495644580438,
             "sekolah": {
                 "luas_tanah_milik": 5000,
                 "luas_tanah_bukan_milik": 0,
                 "daya_listrik": 1300,
                 "akses_internet": "Seluler",
                 "email": "sditnf.palangkaraya@gmail.com",
-                "nomor_telepon": "085249874347"
+                "nomor_telepon": "085249874347",
+                "lintang": -2.2437046908495066,
+                "bujur": 113.89495644580438
             },
             "ruang": {
                 "ruang_kelas_baik": 0,
@@ -9828,7 +9838,9 @@
             },
             "rasio_siswa": {
                 "jml_pd": 22
-            }
+            },
+            "is_manual_override": true,
+            "manual_updated_at": "2026-08-27 15:48:37"
         },
         {
             "sekolah_id": "BC635418-40E4-421F-8A29-E8133F8A2531",
