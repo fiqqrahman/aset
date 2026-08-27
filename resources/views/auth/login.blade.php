@@ -31,8 +31,7 @@
 
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Selamat Datang</h2>
-                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Masukkan NIP / Email dinas dan kata sandi
-                        Antum untuk masuk ke sistem.</p>
+                    <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">Masukkan NIP dan kata sandi untuk masuk ke sistem.</p>
                 </div>
               
                 <!-- Login Form (Full Width to Container) -->
